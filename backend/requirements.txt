@@ -3,3 +3,6 @@ Flask-Cors==3.0.10
 Jinja2==3.0.3
 Werkzeug==2.0.3
 Gunicorn==20.1.0
+python-dotenv>=0.19.2
+authlib>=1.0
+requests>=2.27.1
