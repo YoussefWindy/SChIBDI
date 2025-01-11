@@ -12,10 +12,9 @@ def main_home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-	if request.method == "GET":
-		return render_template('login.html')
-	else:
+	if request.method == "POST":
 		print(request)
+	return render_template('login.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
