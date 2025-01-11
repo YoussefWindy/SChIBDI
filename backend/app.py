@@ -1,4 +1,4 @@
-from flask import Flask, render_template, abort, redirect, url_for # type: ignore
+from flask import Flask, render_template, abort, redirect, url_for, request # type: ignore
 
 app = Flask(__name__)
 
@@ -10,9 +10,12 @@ def home():
 def main_home():
     return render_template('index.html')
 
-@app.route('/login')
+@app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template('login.html')
+	if request.method == "GET":
+		return render_template('login.html')
+	else:
+		print(request)
 
 if __name__ == '__main__':
     app.run(debug=True)

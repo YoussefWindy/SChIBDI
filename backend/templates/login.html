@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SCHIBDI Login</title>
-    <link rel="stylesheet" href="/css/styles.css">
-	<link rel="stylesheet" href="/css/login_styles.css">
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles/styles.css') }}">
+	<link rel="stylesheet" href= "{{ url_for('static',filename='styles/login_styles.css') }}">
 </head>
 <body>
     <header>
@@ -14,7 +14,7 @@
     <main>
         <div>
 			<form action="https://schibdi.onrender.com/login" method="POST">
-				<label for="email">Email: </form>
+				<label for="email">Email: </label>
 				<input id="email" type="email" required><br>
 
 				<label for="password">Password: </label>
