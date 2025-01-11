@@ -5,6 +5,10 @@ div {
 	text-align: center;
 }
 
+form {
+	padding: 5em;
+}
+
 input {
 	width: 50em;
 	height: 2em;
