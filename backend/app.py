@@ -5,9 +5,9 @@ import json
 from os import environ as env
 from urllib.parse import quote_plus, urlencode
 
-from authlib.integrations.flask_client import OAuth
-from dotenv import find_dotenv, load_dotenv
-from flask import Flask, redirect, render_template, session, url_for
+from authlib.integrations.flask_client import OAuth # type: ignore
+from dotenv import find_dotenv, load_dotenv # type: ignore
+from flask import Flask, redirect, render_template, session, url_for # type: ignore
 
 ENV_FILE = find_dotenv()
 if ENV_FILE:
@@ -63,7 +63,7 @@ def logout():
 def callback():
     token = oauth.auth0.authorize_access_token()
     session["user"] = token
-    return redirect("/")
+    return redirect("/dashboard")
 
 @app.get("/dashboard")
 def dashboard():
