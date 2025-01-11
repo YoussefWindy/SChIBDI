@@ -13,7 +13,7 @@ def main_home():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	if request.method == "POST":
-		print(request.form['email'], request.form["password"])
+		app.logger.info(request.form['email'], request.form["password"])
 	return render_template('login.html')
 
 if __name__ == '__main__':
