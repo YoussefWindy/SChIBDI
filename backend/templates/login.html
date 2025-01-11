@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCHIBDI Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Login</h1>
+    </header>
+    <main>
+        <div>
+			<form id="login">
+				<label for="email">Email: </form>
+				<input id="email" type="email" required>
+
+				<label for="password">Password: </label>
+				<input id="password" type="password" required>
+			</form>
+		</div>
+    </main>
+    <footer>
+        <p>&copy; 2025 SChIBDI</p>
+    </footer>
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+</body>
+</html>
