@@ -27,7 +27,7 @@ breakfast.addEventListener("click", function (e) {
 	new_input.name = "breakfast";
 	new_input.placeholder = "Breakfast";
 
-	const newOne = breakfast_inputs.children[0];
+	const newOne = breakfast_inputs.children[breakfast_inputs.length-1];
 	const removeButton = document.createElement("button");
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
@@ -50,7 +50,7 @@ lunch.addEventListener("click", function (e) {
 	new_input.name = "lunch";
 	new_input.placeholder = "Lunch";
 
-	const newOne = lunch_inputs.children[0];
+	const newOne = lunch_inputs.children[lunch_inputs.length-1];
 	const removeButton = document.createElement("button");
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
@@ -72,7 +72,7 @@ dinner.addEventListener("click", function (e) {
 	new_input.name = "dinner";
 	new_input.placeholder = "Dinner";
 
-	const newOne = dinner_inputs.children[0];
+	const newOne = dinner_inputs.children[breakfast_inputs.length-1];
 	const removeButton = document.createElement("button");
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
@@ -94,7 +94,7 @@ snack.addEventListener("click", function (e) {
 	new_input.name = "snack";
 	new_input.placeholder = "Yummy snack 😋";
 
-	const newOne = snack_inputs.children[0];
+	const newOne = snack_inputs.children[snack_inputs.length-1];
 	const removeButton = document.createElement("button");
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
@@ -117,7 +117,7 @@ symptoms.addEventListener("click", function (e) {
 	new_input.list = "symps";
 	new_input.placeholder = "Add a symptom";
 
-	const newOne = symptom_inputs.children[0];
+	const newOne = symptom_inputs.children[symptom_inputs.length-1];
 	const removeButton = document.createElement("button");
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
