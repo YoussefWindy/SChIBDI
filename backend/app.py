@@ -73,5 +73,40 @@ def dashboard():
 		pass
 	return render_template("dashboard.html", breakkies=["Cereal", "Burrito", "Pasta"], syms=["Nausea"])
 
+# Add these routes to your Flask application
+from flask import jsonify, request
+
+@app.route('/add_medication', methods=['POST'])
+def add_medication():
+    data = request.json
+    medication = data.get('medication')
+    
+    try:
+        # Add your database logic here
+        # For example: db.add_medication(medication)
+        return jsonify({'success': True, 'message': 'Medication added successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/remove_medication', methods=['POST'])
+def remove_medication():
+    data = request.json
+    medication = data.get('medication')
+    
+    try:
+        # Add your database logic here
+        # For example: db.remove_medication(medication)
+        return jsonify({'success': True, 'message': 'Medication removed successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+    
+@app.route('/about-us')
+def about():
+    return render_template('about-us.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
 if __name__ == '__main__':
     app.run(debug=True)

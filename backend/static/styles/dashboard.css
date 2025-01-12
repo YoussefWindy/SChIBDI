@@ -86,4 +86,164 @@ textarea:hover,
 textarea:focus {
     outline: none; /* Remove default outline */
     background-color: #f9f9f9; /* Slightly darker background on hover/focus */
+}	
+
+/* Style for the pop-up */
+.popup {
+    display: none; /* Initially hidden */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.7);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.popup-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    text-align: center;
+}
+
+.medication-form {
+    margin-top: 20px;
+}
+
+input {
+    padding: 10px;
+    margin: 10px;
+    width: 80%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px 20px;
+    margin-top: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+#closePopup {
+    background-color: #f44336;
+}
+
+#closePopup:hover {
+    background-color: #da190b;
+}
+
+#medList {
+    margin-top: 15px;
+    text-align: left;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    height: 150px;
+    overflow-y: auto;
+}
+
+/* Add these styles to your CSS file */
+.med-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    padding: 1rem;
+}
+
+.med-header {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.med-list {
+    width: 90%;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+.med-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #ffffff;
+    padding: 0.75rem 1rem;
+    margin: 0.5rem 0;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease;
+}
+
+.med-item:hover {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.med-item-content {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.med-checkbox {
+    margin-right: 1rem;
+}
+
+.med-name {
+    flex: 1;
+    margin: 0 1rem;
+}
+
+.med-remove {
+    background-color: #ff4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 28px;
+    height: 28px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.med-remove:hover {
+    background-color: #cc0000;
+}
+
+.med-input-group {
+    display: flex;
+    align-items: center;
+    width: 90%;
+    margin-top: 1rem;
+    gap: 0.5rem;
+}
+
+.med-input-group input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.med-input-group button {
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    font-size: 1rem;
 }
