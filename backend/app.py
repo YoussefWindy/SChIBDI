@@ -7,7 +7,7 @@ from urllib.parse import quote_plus, urlencode
 
 from authlib.integrations.flask_client import OAuth # type: ignore
 from dotenv import find_dotenv, load_dotenv # type: ignore
-from flask import Flask, redirect, render_template, session, url_for, request, jsonify # type: ignore
+from flask import Flask, redirect, render_template, session, url_for, request, jsonify, escape # type: ignore
 from flask_sqlalchemy import SQLAlchemy, MetaData, create_engine
 from flask_cors import CORS, request # type: ignore
 import cohere # type: ignore 
@@ -184,14 +184,11 @@ def dashboard():
 		pass
 	return render_template("dashboard.html", breakkies=["Cereal", "Burrito", "Pasta"], syms=["Nausea"])
 
-# Add these routes to your Flask application
-from flask import jsonify, request
-
-@app.route('/add_medication', methods=['POST'])
+@app.route('/update_medication', methods=['POST'])
 def add_medication():
     data = request.json
     medication = data.get('medication')
-    
+
     try:
         # Add your database logic here
         # For example: db.add_medication(medication)
@@ -199,18 +196,6 @@ def add_medication():
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 500
 
-@app.route('/remove_medication', methods=['POST'])
-def remove_medication():
-    data = request.json
-    medication = data.get('medication')
-    
-    try:
-        # Add your database logic here
-        # For example: db.remove_medication(medication)
-        return jsonify({'success': True, 'message': 'Medication removed successfully'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
-    
 @app.route('/about-us')
 def about():
     return render_template('about-us.html')
