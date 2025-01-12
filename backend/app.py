@@ -324,7 +324,7 @@ def callback():
     return redirect("/dashboard")
 
 
-@app.get("/dashboard", methods=["GET", "POST"])
+@app.post("/dashboard", methods=["GET", "POST"])
 def dashboard():
     #redirect to login if not logged in
     if request.method == "GET":
