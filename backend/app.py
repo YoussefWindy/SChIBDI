@@ -7,7 +7,7 @@ from urllib.parse import quote_plus, urlencode
 
 from authlib.integrations.flask_client import OAuth # type: ignore
 from dotenv import find_dotenv, load_dotenv # type: ignore
-from flask import Flask, redirect, render_template, session, url_for, request, jsonify # type: ignore
+from flask import Flask, redirect, render_template, session, url_for, request, jsonify, escape # type: ignore
 from flask_sqlalchemy import SQLAlchemy # type: ignore
 from sqlalchemy import create_engine # type: ignore
 from flask_cors import CORS # type: ignore
