@@ -19,74 +19,23 @@
 				<h2>Food</h2>
 				<div class="sub-item" id="breakfast">
 					<h3>Breakfast</h3>
-					<table>
-						<thead>
-							<tr>
-								<th>Food</th>
-								<th>Amount</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>{{meals[0][0]}}</td>
-								<td>{{meals[0][1]}}</td>
-							</tr>
-						</tbody>
-					</table>
+					<p>{{meals[0]}}</p>
 				</div>
 				<div class="sub-item" id="lunch">
 					<h3>Lunch</h3>
-					<table>
-						<thead>
-							<tr>
-								<th>Food</th>
-								<th>Amount</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>{{meals[1][0]}}</td>
-								<td>{{meals[1][1]}}</td>
-							</tr>
-						</tbody>
-					</table>
+					<p>{{meals[1]}}</p>
 				</div>
 				<div class="sub-item" id="dinner">
 					<h3>Dinner</h3>
-					<table>
-						<thead>
-							<tr>
-								<th>Food</th>
-								<th>Amount</th>
-							</tr>
-						</thead>
-						<tbody>
-							<tr>
-								<td>{{meals[2][0]}}</td>
-								<td>{{meals[2][1]}}</td>
-							</tr>
-						</tbody>
-					</table>
+					<p>{{meals[2]}}</p>
 				</div>
 				<div class="sub-item" id="snacks">
 					<h3>Snacks</h3>
 					{% for meal in meals %}
-						{% if loop.index > 2 %}
-							<table>
-								<thead>
-									<tr>
-										<th>Food</th>
-										<th>Amount</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr>
-										<td>{{meal[0]}}</td>
-										<td>{{meal[1]}}</td>
-									</tr>
-								</tbody>
-							</table>
+						{% if loop.index > 3 %}
+							<p>{{meal}}</p>
 						{% endif %}
+					{% endfor %}
 				</div>
 			</div>
 			<div class="col" id="meds">
@@ -96,17 +45,38 @@
 				</div>
 				<div class="sub-item" id="meds">
 					<h3>Today's Medicine</h3>
-				</div>
-				<div class="sub-item" id="missed">
-					<h3>Missed</h3>
+					{% for med in meds %}
+						<input type="checkbox" name="meds" value={{med}} id="medications">
+					{% endfor %}
+					<input type="text" name="add_med" placeholder="Add a medication" id="add_med"><button id="med">+</button>
 				</div>
 			</div>
 			<div class="col no-vis" id="log">
 				<div class="sub-item" id="symptoms">
 					<h2>Symptoms</h2>
+					<p>Today I felt:</p>
+					<ul>
+						{% if syms %}
+							{% for sym of syms %}
+								<li>{{sym}}</li>
+							{% endfor %}
+						{% else %}
+							<li>Fine!</li>
+						{% endif %}
+					</ul>
+					<input type="text" list="symps" id="sympts" name="syms" placeholder="Add a symptom"><button id="symptom">+</button>
+					<datalist id="symps">
+						<option value="Nausea"></option>
+						<option value="Diarrhea"></option>
+						<option value="Mint"></option>
+						{% for sym of syms %}
+							<option value={{sym}}></option>
+						{% endfor %}
+					</datalist>
 				</div>
 				<div class="sub-item" id="notes">
 					<h2>Notes</h2>
+					<textarea width="25vw" name="notes" placeholder="Notes for future you..."></textarea>
 				</div>
 			</div>
 		</div>
@@ -114,7 +84,7 @@
 	<footer>
 		<p>&copy; 2023 My Web App</p>
 	</footer>
-	<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+	<!-- <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script> -->
 </body>
 
 </html>

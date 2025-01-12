@@ -46,3 +46,145 @@ footer {
 .button:hover {
     background: #c0392b;
 }
+
+/* General Page Styles */
+body {
+    background-color: #f9fafb; /* Light background color */
+    color: #333; /* Dark text for good contrast */
+    font-family: 'Helvetica', sans-serif;
+}
+
+header, footer {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); /* Blue gradient for header/footer */
+    color: white;
+}
+
+.container {
+    display: flex;
+    width: 96vw;
+    height: 90vh;
+    padding: 0px;
+    margin: 0 auto;
+    background-color: #fff; /* Light background for container */
+}
+
+.col {
+    padding: 20px 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for the columns */
+    width: 28vw;
+    height: 70vh;
+    background-color: #ffffff; /* White background for columns */
+    margin: auto 1vw;
+    text-align: center;
+}
+
+.col:nth-child(1) {
+    margin-left: 3vw;
+}
+
+.col:nth-child(3) {
+    margin-right: 3vw;
+}
+
+.column h2 {
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #4b5563; /* Darker color for titles */
+}
+
+.sub-item {
+    display: inline-block;
+    padding: 20px 0;
+    border-radius: 8px;
+    width: 28vw;
+    margin: 1vw auto;
+    text-align: center;
+    background-color: #f7fafc; /* Light background for sub-items */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.sub-item h3 {
+    text-align: center;
+    color: #4b5563; /* Darker color for sub-item titles */
+}
+
+.food, .meds {
+    flex-grow: 1;
+}
+
+.sub-item.symptoms, .sub-item.notes {
+    width: 28vw;
+    height: 70vh;
+    margin: 1vw auto;
+    background-color: #f7fafc; /* Light background for symptoms/notes */
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    color: #333; /* Dark text for readability */
+}
+
+.symptoms, .notes {
+    flex-grow: 1;
+}
+
+/* Header and Footer */
+header {
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+footer {
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+footer a {
+    color: white;
+    transition: color 0.3s;
+}
+
+footer a:hover {
+    color: #93c5fd; /* Light blue hover effect */
+}
+
+/* Card Styles for Login and Other Cards */
+.card {
+    background: rgba(255, 255, 255, 0.95); /* Light background with slight opacity */
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card p {
+    color: #6b7280; /* Light gray for description text */
+}
+
+.login-input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ddd;
+    border-radius: 0.375rem;
+    focus:ring-2;
+    focus:ring-blue-500;
+    focus:border-transparent;
+}
+
+.btn-primary {
+    padding: 0.75rem 1.5rem;
+    background-color: #3b82f6; /* Light blue button */
+    color: white;
+    border-radius: 0.5rem;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #2563eb; /* Darker blue on hover */
+}
+
+/* General Typography */
+h2, h3 {
+    font-family: 'Arial', sans-serif;
+    font-weight: 600;
+}

@@ -12,8 +12,7 @@
 	border-radius: 8px;
 	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 	width: 28vw;
-	min-height: 70vh;
-	background-color: #2d2d2d;
+	min-height: 75vh;
 	margin: auto 1vw;
 	text-align: center;
 	display: flex;
@@ -36,23 +35,39 @@
 	text-align: center;
 	font-size: 24px;
 	margin-bottom: 15px;
+	padding: 0px;
+	line-height: 24px;
 }
 
 .sub-item {
 	display: inline-block;
-	padding: 20px 0;
+	padding: 15px 0;
 	border-radius: 8px;
 	width: 28vw;
-	min-height: 10vh;
+	min-height: 11vh;
+	height: fit-content;
+	overflow-y: scroll;
+	overflow-x: hidden;
 	margin: 1vw auto;
 	text-align: center;
 }
 
 #notes, #symptoms {
-	background-color: #2d2d2d;
 	min-height: 35vh;
 }
 
 .sub-item h3 {
 	text-align: center;
+}
+textarea {
+	background-color: rgba(0, 0, 0, 0);
+	border: none;
+	color: white;
+}
+
+textarea:hover {
+	background-color: rgb(100, 100, 100);
+}
+textarea:active {
+	background-color: rgb(100, 100, 100);
 }
