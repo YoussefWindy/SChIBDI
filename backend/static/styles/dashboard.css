@@ -71,3 +71,19 @@ textarea:hover {
 textarea:active {
 	background-color: rgb(100, 100, 100);
 }
+
+textarea#notes-box {
+    background-color: rgba(255, 255, 255, 1); /* White background */
+    border: 2px dotted #000; /* Black dotted border */
+    color: #000; /* Black text */
+    padding: 10px;
+    width: 90%; /* Adjusted width */
+    min-height: 120px; /* Minimum height */
+    resize: vertical; /* Allow vertical resizing */
+}
+
+textarea#notes-box:hover,
+textarea#notes-box:focus {
+    outline: none; /* Remove default outline */
+    background-color: #f9f9f9; /* Slightly darker background on hover/focus */
+}
