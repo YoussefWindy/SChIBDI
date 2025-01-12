@@ -46,7 +46,11 @@
 				<div class="sub-item" id="meds">
 					<h3>Today's Medicine</h3>
 					{% for med in meds %}
-						<input type="checkbox" name="meds" value={{med}} id="medications">
+						{% if med[1] %}
+							<input type="checkbox" name="meds" value={{med}} checked id="medications">
+						{% else %}
+							<input type="checkbox" name="meds" value={{med}} id="medications">
+						{% endif $}
 					{% endfor %}
 					<input type="text" name="add_med" placeholder="Add a medication" id="add_med"><button id="med">+</button>
 				</div>
