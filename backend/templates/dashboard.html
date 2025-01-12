@@ -35,10 +35,14 @@
 					<h3>Breakfast</h3>
 					<div id="breakfast-inputs">
 						{% for breakky in breakkies %}
-							<div classfood-list></div>
-							<input type="text" name="breakfast" value="{{breakky}}" placeholder="Breakfast" class="breakfast">
+							<div class="meal">
+								<input type="text" name="breakfast" value="{{breakky}}" placeholder="Breakfast" class="breakfast">
+								<button class="item-remove">-</button>
+							</div>
 						{% endfor %}
-						<input type="text" name="breakfast" placeholder="Breakfast" id="breakfast" class="breakfast">
+						<div class="meal">
+							<input type="text" name="breakfast" placeholder="Breakfast" id="breakfast" class="breakfast">
+						</div>
 					</div>
 					<button id="break-add">+</button>
 				</div>
@@ -46,9 +50,14 @@
 					<h3>Lunch</h3>
 					<div id="lunch-inputs">
 						{% for lunchy in lunchies %}
-							<input type="text" name="lunch" value="{{lunchy}}" placeholder="Lunch" class="lunch">
+							<div class="meal">
+								<input type="text" name="lunch" value="{{lunchy}}" placeholder="Lunch" class="lunch">
+								<button class="item-remove">-</button>
+							</div>
 						{% endfor %}
-						<input type="text" name="lunch" placeholder="Lunch" class="lunch">
+						<div class="meal">
+							<input type="text" name="lunch" placeholder="Lunch" class="lunch">
+						</div>
 					</div>
 					<button id="lunch-add">+</button>
 				</div>
@@ -56,9 +65,14 @@
 					<h3>Dinner</h3>
 					<div id="dinner-inputs">
 						{% for dinny in dinnies %}
-							<input type="text" name="dinner" value="{{dinny}}" placeholder="Dinner" class="dinner">
+							<div class="meal">
+								<input type="text" name="dinner" value="{{dinny}}" placeholder="Dinner" class="dinner">
+								<button class="item-remove">-</button>
+							</div>
 						{% endfor %}
-						<input type="text" name="dinner" placeholder="Dinner" class="dinner">
+						<div class="meal">
+							<input type="text" name="dinner" placeholder="Dinner" class="dinner">
+						<div class="meal">
 					</div>
 					<button id="dinner-add">+</button>
 				</div>
@@ -66,9 +80,14 @@
 					<h3>Snacks</h3>
 					<div id="snack-inputs">
 						{% for snacky in snackies %}
-							<input type="text" name="snack" value="{{snacky}}" placeholder="Yummy snack 😋" class="snack">
+							<div class="meal">
+								<input type="text" name="snack" value="{{snacky}}" placeholder="Yummy snack 😋" class="snack">
+								<button class="item-remove">-</button>
+							</div>
 						{% endfor %}
-						<input type="text" name="snack" placeholder="Yummy snack 😋" class="snack">
+						<div class="meal">
+							<input type="text" name="snack" placeholder="Yummy snack 😋" class="snack">
+						</div>
 					</div>
 					<button id="snack-add">+</button>
 				</div>
@@ -129,9 +148,14 @@
 						<p>Today I felt:</p>
 						<div id="sym-inputs">
 							{% for sym in syms %}
-								<input type="text" list="symps" value="{{sym}}" class="sympts" name="syms" placeholder="Add a symptom">
+								<div class="symmies">
+									<input type="text" list="symps" value="{{sym}}" class="sympts" name="syms" placeholder="Add a symptom">
+									<button class="item-remove">-</button>
+								</div>
 							{% endfor %}
-							<input type="text" list="symps" class="sympts" name="syms" placeholder="Add a symptom">
+							<div class="symmies">
+								<input type="text" list="symps" class="sympts" name="syms" placeholder="Add a symptom">
+							</div>
 							<datalist id="symps">
 								<option value="Nausea"></option>
 								<option value="Diarrhea"></option>

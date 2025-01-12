@@ -26,8 +26,18 @@ breakfast.addEventListener("click", function (e) {
 	new_input.classList.add("breakfast");
 	new_input.name = "breakfast";
 	new_input.placeholder = "Breakfast";
+
+	const newOne = breakfast_inputs.children[0];
+	const removeButton = document.createElement("button");
+	removeButton.classList.add("item-remove");
+	newOne.appendChild(removeButton);
+	
+	const newDiv = document.createElement("div");
+	newDiv.classList.add("meal");
+	newDiv.appendChild(new_input)
 	breakfast_inputs.appendChild(document.createElement("br"));
-	breakfast_inputs.appendChild(new_input);
+	breakfast_inputs.appendChild(newDiv);
+	
 });
 
 const lunch = document.getElementById("lunch-add");
@@ -38,8 +48,17 @@ lunch.addEventListener("click", function (e) {
 	new_input.classList.add("lunch");
 	new_input.name = "lunch";
 	new_input.placeholder = "Lunch";
+
+	const newOne = lunch_inputs.children[0];
+	const removeButton = document.createElement("button");
+	removeButton.classList.add("item-remove");
+	newOne.appendChild(removeButton);
+
+	const newDiv = document.createElement("div");
+	newDiv.classList.add("meal");
+	newDiv.appendChild(new_input)
 	lunch_inputs.appendChild(document.createElement("br"));
-	lunch_inputs.appendChild(new_input);
+	lunch_inputs.appendChild(newDiv);
 });
 
 const dinner = document.getElementById("dinner-add");
@@ -50,8 +69,17 @@ dinner.addEventListener("click", function (e) {
 	new_input.classList.add("dinner");
 	new_input.name = "dinner";
 	new_input.placeholder = "Dinner";
+
+	const newOne = dinner_inputs.children[0];
+	const removeButton = document.createElement("button");
+	removeButton.classList.add("item-remove");
+	newOne.appendChild(removeButton);
+
+	const newDiv = document.createElement("div");
+	newDiv.classList.add("meal");
+	newDiv.appendChild(new_input)
 	dinner_inputs.appendChild(document.createElement("br"));
-	dinner_inputs.appendChild(new_input);
+	dinner_inputs.appendChild(newDiv);
 });
 
 const snack = document.getElementById("snack-add");
@@ -62,8 +90,17 @@ snack.addEventListener("click", function (e) {
 	new_input.classList.add("snack");
 	new_input.name = "snack";
 	new_input.placeholder = "Yummy snack 😋";
+
+	const newOne = snack_inputs.children[0];
+	const removeButton = document.createElement("button");
+	removeButton.classList.add("item-remove");
+	newOne.appendChild(removeButton);
+
+	const newDiv = document.createElement("div");
+	newDiv.classList.add("meal");
+	newDiv.appendChild(new_input)
 	snack_inputs.appendChild(document.createElement("br"));
-	snack_inputs.appendChild(new_input);
+	snack_inputs.appendChild(newDiv);
 });
 
 const symptoms = document.getElementById("sym-add");
@@ -75,14 +112,31 @@ symptoms.addEventListener("click", function (e) {
 	new_input.name = "syms";
 	new_input.list = "symps";
 	new_input.placeholder = "Add a symptom";
+
+	const newOne = symptom_inputs.children[0];
+	const removeButton = document.createElement("button");
+	removeButton.classList.add("item-remove");
+	newOne.appendChild(removeButton);
+
+	const newDiv = document.createElement("div");
+	newDiv.classList.add("symmies");
+	newDiv.appendChild(new_input)
 	symptom_inputs.appendChild(document.createElement("br"));
-	symptom_inputs.appendChild(new_input);
+	symptom_inputs.appendChild(newDiv);
 });
 
 const closePopup = document.getElementById("closePopup");
 closePopup.addEventListener("click", function () {
 	medPopup.style.display = "none"; // Close pop-up
 });
+
+const itemRemovers = document.getElementsByClassName("item-remove");
+for (let item of itemRemovers) {
+	item.addEventListener("click", removeItem);
+} 
+function removeItem(remove_button) {
+	this.parent.remove();
+}
 
 const saveMeds = document.getElementById("save");
 saveMeds.addEventListener("click", function (e) {
@@ -94,6 +148,7 @@ saveMeds.addEventListener("click", function (e) {
 	fetch("/save_meds", {
 		method: "POST",
 		body: JSON.stringify({
+			medicine: true,
 
 		})
 	})
