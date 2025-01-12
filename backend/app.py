@@ -327,8 +327,7 @@ def callback():
 @app.post("/dashboard", methods=["GET", "POST"])
 def dashboard():
     #redirect to login if not logged in
-    if "user" not in session:
-        return redirect(url_for("login"))
+    
     if request.method == "GET":
 
         return render_template("dashboard.html", breakkies=["Cereal", "Burrito", "Pasta"], syms=["Nausea"])
