@@ -18,25 +18,39 @@
 		<div class="container">
 			<div class="col" id="food">
 				<h2>Food</h2>
-				<div class="sub-item" id="breakfast">
+				<div class="sub-item" id="breakfst">
 					<h3>Breakfast</h3>
-					<p>{{meals[0]}}</p>
+					{% for breakky in breakkies %}
+						<input type="text" name="breakfast" value={{breakky}} placeholder="Breakfast" class="breakfast">
+					{% endfor %}
+					<input type="text" name="breakfast" placeholder="Breakfast" id="breakfast" class="breakfast">
+					<button id="break-submit">✔️</button>
 				</div>
 				<div class="sub-item" id="lunch">
 					<h3>Lunch</h3>
-					<p>{{meals[1]}}</p>
+					{% for lunchy in lunchies %}
+						<input type="text" name="lunch" value={{lunchy}} placeholder="Lunch" class="lunch">
+					{% endfor %}
+					<input type="text" name="lunch" placeholder="Lunch" class="lunch">
+					<button id="lunch-submit">✔️</button>
 				</div>
 				<div class="sub-item" id="dinner">
 					<h3>Dinner</h3>
-					<p>{{meals[2]}}</p>
+					{% for dinny in dinnies %}
+						<input type="text" name="dinner" value={{dinny}} placeholder="Dinner" class="dinner">
+					{% endfor %}
+					<input type="text" name="dinner" placeholder="Dinner" class="dinner">
+					<button id="dinner-submit">✔️</button>
 				</div>
 				<div class="sub-item" id="snacks">
 					<h3>Snacks</h3>
-					{% for meal in meals %}
+					{% for snacky in snackies %}
 						{% if loop.index > 3 %}
-							<p>{{meal}}</p>
+							<input type="text" name="snack" value={{snacky}} placeholder="snack" class="snack">
 						{% endif %}
 					{% endfor %}
+					<input type="text" name="snack" placeholder="Yummy snack 😋" class="snack">
+					<button id="snack-submit">✔️</button>
 				</div>
 			</div>
 			<div class="col" id="meds">
@@ -61,13 +75,10 @@
 					<h2>Symptoms</h2>
 					<p>Today I felt:</p>
 					<ul>
-						{% if syms %}
-							{% for sym in syms %}
-								<li>{{sym}}</li>
-							{% endfor %}
-						{% else %}
-							<li>Fine!</li>
-						{% endif %}
+						{% for sym in syms %}
+							<input type="text" list="symps" value={{sym}} id="sympts" name="syms" placeholder="Add a symptom">
+						{% endfor %}
+						<input type="text" list="symps" id="sympts" name="syms" placeholder="Add a symptom">
 					</ul>
 					<input type="text" list="symps" id="sympts" name="syms" placeholder="Add a symptom"><button id="symptom">+</button>
 					<datalist id="symps">
@@ -78,6 +89,7 @@
 							<option value={{sym}}></option>
 						{% endfor %}
 					</datalist>
+					<button id="note-submit">✔️</button>
 				</div>
 				<div class="sub-item" id="notes">
 					<h2>Notes</h2>
@@ -86,6 +98,7 @@
 							{{notes}}
 						{% endif %}
 					</textarea>
+					<button id="note-submit">✔️</button>
 				</div>
 			</div>
 		</div>

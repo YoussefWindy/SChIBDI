@@ -71,7 +71,7 @@ def dashboard():
 		pass
 	else:
 		pass
-	return render_template("dashboard.html", meals=["Cereal", "Burrito", "Pasta"])
+	return render_template("dashboard.html", breakkies=["Cereal", "Burrito", "Pasta"], syms=["Nausea"])
 
 if __name__ == '__main__':
     app.run(debug=True)
