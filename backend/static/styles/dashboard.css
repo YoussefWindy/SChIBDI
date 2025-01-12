@@ -86,7 +86,7 @@ textarea:hover,
 textarea:focus {
     outline: none; /* Remove default outline */
     background-color: #f9f9f9; /* Slightly darker background on hover/focus */
-}
+}	
 
 .popup {
     display: none; /* Initially hidden */

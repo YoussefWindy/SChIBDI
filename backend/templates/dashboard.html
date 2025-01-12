@@ -10,11 +10,24 @@
 </head>
 
 <body>
+	<div class="popup" id="medPopup">
+		<div class="popup-content">
+			<h2>Welcome! Please enter the medications you're currently taking:</h2>
+			<div class="medication-form">
+				<input type="text" id="medName" name="medName" placeholder="Medication name">
+				<button id="addMedBtn">Add Medication</button>
+				<div id="medList"></div>
+				<button id="closePopup">Close</button>
+			</div>
+		</div>
+	</div>
+	
+
 	<header>
 		<h1>Dashboard</h1>
 	</header>
 	<main>
-		<label for="date">Select Date to View</label><input type="date" name="date" id="date_picker"><button id="date">Go</button>
+		<label for="date">Select Date to View</label><input type="date" name="date" id="date_picker"><button id="date">Go</button>		
 		<div class="container">
 			<div class="col" id="food">
 				<h2>Food</h2>
@@ -59,6 +72,7 @@
 					<button id="snack-add">+</button>
 				</div>
 			</div>
+			<!-- Replace your existing medication section with this -->
 			<div class="col" id="meds">
 				<h2>Medication</h2>
 				<div class="med-inputs">
