@@ -80,7 +80,11 @@
 				</div>
 				<div class="sub-item" id="notes">
 					<h2>Notes</h2>
-					<textarea width="25vw" name="notes" placeholder="Notes for future you..."></textarea>
+					<textarea width="25vw" name="notes" placeholder="Notes for future you...">
+						{% if notes %}
+							{{notes}}
+						{% endif %}
+					</textarea>
 				</div>
 			</div>
 		</div>
