@@ -9,7 +9,7 @@ from authlib.integrations.flask_client import OAuth # type: ignore
 from dotenv import find_dotenv, load_dotenv # type: ignore
 from flask import Flask, redirect, render_template, session, url_for, request, jsonify # type: ignore
 from flask_sqlalchemy import SQLAlchemy, MetaData, create_engine
-from flask_cors import CORS # type: ignore
+from flask_cors import CORS, request # type: ignore
 import cohere # type: ignore 
 
 ENV_FILE = find_dotenv()
@@ -178,7 +178,11 @@ def callback():
 
 @app.get("/dashboard")
 def dashboard():
-      return render_template("dashboard.html")
+	if request.args:
+		pass
+	else:
+		pass
+	return render_template("dashboard.html", breakkies=["Cereal", "Burrito", "Pasta"], syms=["Nausea"])
 
 if __name__ == '__main__':
     with app.app_context():
