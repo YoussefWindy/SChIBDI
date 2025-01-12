@@ -53,13 +53,11 @@ class UserData:
     }
     
     SETTINGS_SCHEMA = {
-        'id': 'VARCHAR(120) UNIQUE',
-        'name': 'VARCHAR(100)',
+        'id': 'SERIAL PRIMARY KEY',
+        'name': 'VARCHAR(50)',
         'age' : 'INTEGER',
-        'type': 'VARCHAR(100)',
-    }
-    
-    MEDS_SCHEMA = {
+        'type': 'VARCHAR(75)',
+
         # Medication settings, table has id of the user.
         'medication_name': 'VARCHAR(50)',
         'medication_time': 'BOOLEAN[]',
@@ -71,80 +69,7 @@ class UserData:
         self.food = food
         self.medication_taken = medication_taken
         self.symptoms = symptoms
-
-def get_daily_data(user_id, query_date):
-    conn = daily_pool.getconn()
-    try:
-        with conn.cursor() as cur:
-            cur.execute(f"""
-                SELECT date, mealtime, food, symptoms 
-                FROM {user_id}  
-                WHERE date = %s
-            """, (query_date,))  # Added missing comma for single-item tuple
-            row = cur.fetchone()
-            
-            if row is None:
-                # Return default empty values if no row found
-                return (query_date, "", [], [])
-            return row
-    finally:
-        daily_pool.putconn(conn)
-
-def get_user_settings(user_id):
-    conn = settings_pool.getconn()
-    try:
-        with conn.cursor() as cur:
-            cur.execute(f"""
-                SELECT *
-                FROM profiles
-                WHERE id = %s
-            """, (user_id,)) # Added missing comma for single-item tuple
-            row = cur.fetchone()
-            
-            if row is None:
-                return (None, None, None)
-            return row
-    finally:
-        settings_pool.putconn(conn)
-
-def get_meds_info(user_id, num_meds=False):
-    conn = settings_pool.getconn()
-    try:
-        with conn.cursor() as cur:
-            if (num_meds):
-                cur.execute(f"""
-                    SELECT COUNT(*)
-                    FROM {user_id}
-                """)
-                ret = cur.fetchone()
-                return ret[0]
-            cur.execute(f"""
-                SELECT *
-                FROM {user_id}
-            """)
-            ret = cur.fetchall()
-            
-            if ret is None:
-                return [None, None]
-            return ret
-    finally:
-        settings_pool.putconn(conn)
-
-def get_chat_history(user_id):
-    conn = settings_pool.getconn()
-    try:
-        with conn.cursor() as cur:
-            cur.execute(f"""
-                SELECT *
-                FROM chat_history
-                WHERE id = %s
-            """, (user_id,))
-            ret = cur.fetchall()
-            
-            return ret
-    finally:
-        settings_pool.putconn(conn)
-
+ 
 def create_daily_table(username):
     conn = daily_pool.getconn()
     try:
@@ -170,35 +95,7 @@ def create_user_table(user_id):
     finally:
         settings_pool.putconn(conn)
 
-def update_daily_data(user_id, query_date, mealtime, food, symptoms):
-    conn = daily_pool.getconn()
-    try:
-        with conn.cursor() as cur:
-            cur.execute(f"""
-                INSERT INTO {user_id} (date, mealtime, food, symptoms)
-                VALUES (%s, %s, %s, %s)
-                ON CONFLICT (date) DO UPDATE
-                SET mealtime = EXCLUDED.mealtime,
-                    food = EXCLUDED.food,
-                    symptoms = EXCLUDED.symptoms
-            """, (query_date, mealtime, food, symptoms))
-            conn.commit()
-    finally:
-        daily_pool.putconn(conn)
-
-def update_meds_info(user_id, med_name, med_times):
-    conn = settings_pool.getconn()
-    try:
-        with conn.cursor() as cur:
-            cur.execute(f"""
-                INSERT INTO {user_id} (medication_name, medication_time)
-                VALUES (%s, %s)
-                ON CONFLICT (medication_name) DO UPDATE
-                SET medication_time = EXCLUDED.medication_time
-            """, (med_name, med_times))
-            conn.commit()
-    finally:
-        settings_pool.putconn(conn)
+def update
 
 def submit(user_id, query_date):
     """Handle GET/POST requests for user data by date"""
@@ -326,10 +223,10 @@ def callback():
 
 @app.get("/dashboard", methods=["GET", "POST"])
 def dashboard():
-    #redirect to login if not logged in
     if request.method == "GET":
         return render_template("dashboard.html", breakkies=["Cereal", "Burrito", "Pasta"], syms=["Nausea"])
-    if request.args: 
+    if request.args: #if redirected with an argument, the 
+        user_id = session.get("user").get("sub")
         query_date = request.args.get('date')
         return submit(user_id, query_date)
     else:
