@@ -14,6 +14,7 @@
 		<h1>Dashboard</h1>
 	</header>
 	<main>
+		<label for="date">Select Date to View</label><input type="date" name="date" id="date_picker"><button id="date">Go</button>
 		<div class="container">
 			<div class="col" id="food">
 				<h2>Food</h2>
@@ -50,7 +51,7 @@
 							<input type="checkbox" name="meds" value={{med}} checked id="medications">
 						{% else %}
 							<input type="checkbox" name="meds" value={{med}} id="medications">
-						{% endif $}
+						{% endif %}
 					{% endfor %}
 					<input type="text" name="add_med" placeholder="Add a medication" id="add_med"><button id="med">+</button>
 				</div>
@@ -61,7 +62,7 @@
 					<p>Today I felt:</p>
 					<ul>
 						{% if syms %}
-							{% for sym of syms %}
+							{% for sym in syms %}
 								<li>{{sym}}</li>
 							{% endfor %}
 						{% else %}
@@ -73,7 +74,7 @@
 						<option value="Nausea"></option>
 						<option value="Diarrhea"></option>
 						<option value="Mint"></option>
-						{% for sym of syms %}
+						{% for sym in syms %}
 							<option value={{sym}}></option>
 						{% endfor %}
 					</datalist>
@@ -92,7 +93,7 @@
 	<footer>
 		<p>&copy; 2023 My Web App</p>
 	</footer>
-	<!-- <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script> -->
+	<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 </body>
 
 </html>
