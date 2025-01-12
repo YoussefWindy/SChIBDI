@@ -7,7 +7,7 @@ from urllib.parse import quote_plus, urlencode
 
 from authlib.integrations.flask_client import OAuth # type: ignore
 from dotenv import find_dotenv, load_dotenv # type: ignore
-from flask import Flask, redirect, render_template, session, url_for # type: ignore
+from flask import Flask, redirect, render_template, session, url_for, request # type: ignore
 
 ENV_FILE = find_dotenv()
 if ENV_FILE:
@@ -67,7 +67,11 @@ def callback():
 
 @app.get("/dashboard")
 def dashboard():
-      return render_template("dashboard.html", meals=["Cereal", "Burrito", "Pasta"])
+	if request.args:
+		pass
+	else:
+		pass
+	return render_template("dashboard.html", meals=["Cereal", "Burrito", "Pasta"])
 
 if __name__ == '__main__':
     app.run(debug=True)
