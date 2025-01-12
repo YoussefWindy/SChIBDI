@@ -4,6 +4,7 @@
 import json
 from os import environ as env
 from urllib.parse import quote_plus, urlencode
+import datetime
 
 from authlib.integrations.flask_client import OAuth # type: ignore
 from dotenv import find_dotenv, load_dotenv # type: ignore
@@ -174,14 +175,17 @@ def update_daily_data(user_id, query_date, mealtime, food, symptoms):
     conn = daily_pool.getconn()
     try:
         with conn.cursor() as cur:
+            # Delete existing data for the given date
+            cur.execute(f"""
+                DELETE FROM {user_id}
+                WHERE date = %s
+            """, query_date)
+            
+            # Insert new data
             cur.execute(f"""
                 INSERT INTO {user_id} (date, mealtime, food, symptoms)
                 VALUES (%s, %s, %s, %s)
-                ON CONFLICT (date) DO UPDATE
-                SET mealtime = EXCLUDED.mealtime,
-                    food = EXCLUDED.food,
-                    symptoms = EXCLUDED.symptoms
-            """, (query_date, mealtime, food, symptoms))
+            """, query_date, mealtime, food, symptoms)
             conn.commit()
     finally:
         daily_pool.putconn(conn)
@@ -190,70 +194,73 @@ def update_meds_info(user_id, med_name, med_times):
     conn = settings_pool.getconn()
     try:
         with conn.cursor() as cur:
+            # Delete existing data
             cur.execute(f"""
-                INSERT INTO {user_id} (medication_name, medication_time)
+                DELETE * FROM {user_id}
+            """, med_name)
+            
+            # Insert new data
+            cur.execute(f"""
+                INSERT INTO {user_id} (med_name, med_times)
                 VALUES (%s, %s)
-                ON CONFLICT (medication_name) DO UPDATE
-                SET medication_time = EXCLUDED.medication_time
-            """, (med_name, med_times))
+            """, med_name, med_times)
             conn.commit()
     finally:
         settings_pool.putconn(conn)
 
-def submit(user_id, query_date):
-    """Handle GET/POST requests for user data by date"""
-    # Set correct table name
-    UserData.__table__.name = user_id
+def update_user_settings(user_id, name, age, type):
+    conn = settings_pool.getconn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f"""
+                INSERT INTO profiles (id, name, age, type)
+                VALUES (%s, %s, %s, %s)
+                ON CONFLICT (id) DO NOTHING
+            """, (user_id, name, age, type))
+            conn.commit()
+    finally:
+        settings_pool.putconn(conn)
+
+# def submit(user_id, query_date):
+#     """Handle GET/POST requests for user data by date"""
+#     # Set correct table name
+#     UserData.__table__.name = user_id
     
-    if request.method == 'GET':
-        row = UserData.query.filter_by(date=query_date).first()
-        if not row:
-            new_entry = UserData(
-                date=query_date,
-            )
-            
-        return jsonify({
-            'date': row.date,
-            'mealtime': row.mealtime,
-            'food': row.food,
-            'medication_name': row.medication_name,
-            'medication_taken': row.medication_taken,
-            'symptoms': row.symptoms
-        })
+#     if request.method == 'GET':
+#         row = get_daily_data(user_id, query_date)
+#         if not row:
+#             new_entry = UserData(date=query_date)
 
-    if request.method == 'POST':
-        data = request.get_json()
+#         return jsonify({
+#             'date': row.date,
+#             'mealtime': row.mealtime,
+#             'food': row.food,
+#             'medication_name': row.medication_name,
+#             'medication_taken': row.medication_taken,
+#             'symptoms': row.symptoms
+#         })
+
+#     if request.method == 'POST':
+#         data = request.get_json()
         
-        # Validate required fields
-        if not all(k in data for k in ('mealtime', 'food')):
-            return jsonify({'error': 'Missing required fields'}), 400
 
-        existing = UserData.query.filter_by(date=query_date).first()
-        if existing:
-            # Update existing record
-            existing.mealtime = data['mealtime']
-            existing.food = data['food']
-            existing.medication_name = data.get('medication_name')
-            existing.medication_taken = data.get('medication_taken')
-            existing.symptoms = data.get('symptoms')
-        else:
-            # Create new record
-            new_entry = UserData(
-                date=query_date,
-                mealtime=data['mealtime'],
-                food=data['food'],
-                medication_name=data.get('medication_name'),
-                medication_taken=data.get('medication_taken'),
-                symptoms=data.get('symptoms')
-            )
-            db.session.add(new_entry)
-
-        try:
-            db.session.commit()
-            return jsonify({'message': 'Data saved successfully'}), 200
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'error': str(e)}), 500
+#         if existing:
+#             # Update existing record
+#             existing.mealtime = data['mealtime']
+#             existing.food = data['food']
+#             existing.medication_name = data.get('medication_name')
+#             existing.medication_taken = data.get('medication_taken')
+#             existing.symptoms = data.get('symptoms')
+#         else:
+#             # Create new record
+#             new_entry = UserData(
+#                 date=query_date,
+#                 mealtime=data['mealtime'],
+#                 food=data['food'],
+#                 medication_name=data.get('medication_name'),
+#                 medication_taken=data.get('medication_taken'),
+#                 symptoms=data.get('symptoms')
+#             )
         
 app.secret_key = env.get("APP_SECRET_KEY")
 
@@ -319,23 +326,34 @@ def logout():
 
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
-    token = oauth.auth0.authorize_access_token()
-    session["user"] = token
-    return redirect("/dashboard")
+    try:
+        token = oauth.auth0.authorize_access_token()
+        if not token:
+            return redirect("/login")
+        session["user"] = token
+        return redirect("/dashboard")
+    except Exception as e:
+        return redirect("/login")
 
 
 @app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
-    #redirect to login if not logged in
+    #redirect to login if not logged in 
     if "user" not in session:
         return redirect(url_for("login"))
-    
-    if request.method == "GET":
-
-        return render_template("dashboard.html", breakkies=["Cereal", "Burrito", "Pasta"], syms=["Nausea"])
-    if request.args: 
+    user_id = session.get("user", {}).get("sub")
+    if not user_id:
+        session.clear()
+        return redirect(url_for("login"))
+    if request.args:
         query_date = request.args.get('date')
-        return submit(user_id, query_date)
+        return get_daily_data(user_id, query_date)
+    if request.method == "GET":
+        user_id = session.get("user", {}).get("sub")
+        user_data = get_user_settings(user_id)
+        meds_info = get_meds_info(user_id)
+        daily_data = get_daily_data(user_id, datetime.date.today())
+        return render_template("dashboard.html", user_data=user_data, meds_info=meds_info, daily_data=daily_data)
     else:
         pass
 

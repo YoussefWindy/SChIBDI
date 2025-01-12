@@ -100,73 +100,81 @@
 					<div class="sub-item" id="meds">
 						<h3>Today's Medicine</h3>
 						<h4>Morning</h4>
-						{% for med in meds %}
-							{% if med[2] == "Morning" %}
-								{% if med[1] %}
-									<input type="checkbox" name="meds" id="{{med[0]}}" class="meds" value="{{med[0]}}" checked id="medications"><label for="{{med}}">{{med[0]}}</label>
-								{% else %}
-									<input type="checkbox" name="meds" id="{{med[0]}}" class="meds" value="{{med}}" id="medications"><label for="{{med}}">{{med[0]}}</label>
+						<div id="morning">
+							{% for med in meds %}
+								{% if med[2] == "Morning" %}
+									{% if med[1] %}
+										<input type="checkbox" name="meds" id="{{med[0]}}" class="meds" value="{{med[0]}}" checked id="medications"><label for="{{med}}">{{med[0]}}</label>
+									{% else %}
+										<input type="checkbox" name="meds" id="{{med[0]}}" class="meds" value="{{med}}" id="medications"><label for="{{med}}">{{med[0]}}</label>
+									{% endif %}
 								{% endif %}
-							{% endif %}
-						{% endfor %}
+							{% endfor %}
+						</div>
 						<h4>Afternoon</h4>
-						{% for med in meds %}
-							{% if med[2] == "Afternoon" %}
-								{% if med[1] %}
-									<input type="checkbox" name="meds" id="{{med[0]}}" class="meds" value="{{med[0]}}" checked id="medications"><label for="{{med}}">{{med[0]}}</label>
-								{% else %}
-									<input type="checkbox" name="meds" id="{{med[0]}}" class="meds" value="{{med}}" id="medications"><label for="{{med}}">{{med[0]}}</label>
+						<div id="afternoon">
+							{% for med in meds %}
+								{% if med[2] == "Afternoon" %}
+									{% if med[1] %}
+										<input type="checkbox" name="meds" id="{{med[0]}}" class="meds" value="{{med[0]}}" checked id="medications"><label for="{{med}}">{{med[0]}}</label>
+									{% else %}
+										<input type="checkbox" name="meds" id="{{med[0]}}" class="meds" value="{{med}}" id="medications"><label for="{{med}}">{{med[0]}}</label>
+									{% endif %}
 								{% endif %}
-							{% endif %}
-						{% endfor %}
+							{% endfor %}
+						</div>
 						<h4>Evening</h4>
-						{% for med in meds %}
-							{% if med[2] == "Evening" %}
-								{% if med[1] %}
-									<input type="checkbox" name="meds" id="{{med[0]}}" class="meds" value="{{med[0]}}" checked id="medications"><label for="{{med}}">{{med[0]}}</label>
-								{% else %}
-									<input type="checkbox" name="meds" id="{{med[0]}}" class="meds" value="{{med}}" id="medications"><label for="{{med}}">{{med[0]}}</label>
+						<div id="evening">
+							{% for med in meds %}
+								{% if med[2] == "Evening" %}
+									{% if med[1] %}
+										<input type="checkbox" name="meds" id="{{med[0]}}" class="meds" value="{{med[0]}}" checked id="medications"><label for="{{med}}">{{med[0]}}</label>
+									{% else %}
+										<input type="checkbox" name="meds" id="{{med[0]}}" class="meds" value="{{med}}" id="medications"><label for="{{med}}">{{med[0]}}</label>
+									{% endif %}
 								{% endif %}
-							{% endif %}
-						{% endfor %}
+							{% endfor %}
+						</div>
 						<h4>Night</h4>
-						{% for med in meds %}
-							{% if med[2] == "Night" %}
-								{% if med[1] %}
-									<input type="checkbox" name="meds" id="{{med[0]}}" class="meds" value="{{med[0]}}" checked id="medications"><label for="{{med}}">{{med[0]}}</label>
-								{% else %}
-									<input type="checkbox" name="meds" id="{{med[0]}}" class="meds" value="{{med}}" id="medications"><label for="{{med}}">{{med[0]}}</label>
+						<div id="night">
+							{% for med in meds %}
+								{% if med[2] == "Night" %}
+									{% if med[1] %}
+										<input type="checkbox" name="meds" id="{{med[0]}}" class="meds" value="{{med[0]}}" checked id="medications"><label for="{{med}}">{{med[0]}}</label>
+									{% else %}
+										<input type="checkbox" name="meds" id="{{med[0]}}" class="meds" value="{{med}}" id="medications"><label for="{{med}}">{{med[0]}}</label>
+									{% endif %}
 								{% endif %}
-							{% endif %}
-						{% endfor %}
+							{% endfor %}
+						</div>
 					</div>
 				</div>
 			</div>
 			<div class="col no-vis" id="log">
 				<div class="sub-item" id="symptoms">
 					<h2>Symptoms</h2>
-						<p>Today I felt:</p>
-						<div id="sym-inputs">
-							{% for sym in syms %}
-								<div class="symmies">
-									<input type="text" list="symps" value="{{sym}}" class="sympts" name="syms" placeholder="Add a symptom">
-									<button class="item-remove">-</button>
-								</div>
-							{% endfor %}
+					<p>Today I felt:</p>
+					<div id="sym-inputs">
+						{% for sym in syms %}
 							<div class="symmies">
-								<input type="text" list="symps" class="sympts" name="syms" placeholder="Add a symptom">
+								<input type="text" list="symps" value="{{sym}}" class="sympts" name="syms" placeholder="Add a symptom">
+								<button class="item-remove">-</button>
 							</div>
-							<datalist id="symps">
-								<option value="Nausea"></option>
-								<option value="Diarrhea"></option>
-								<option value="Mint"></option>
-								{% for sym in syms %}
-									{% if sym != "Nausea" and sym != "Diarrhea" %}
-										<option value="{{sym}}"></option>
-									{% endif %}
-								{% endfor %}
-							</datalist>
+						{% endfor %}
+						<div class="symmies">
+							<input type="text" list="symps" class="sympts" name="syms" placeholder="Add a symptom">
 						</div>
+						<datalist id="symps">
+							<option value="Nausea"></option>
+							<option value="Diarrhea"></option>
+							<option value="Mint"></option>
+							{% for sym in syms %}
+								{% if sym != "Nausea" and sym != "Diarrhea" %}
+									<option value="{{sym}}"></option>
+								{% endif %}
+							{% endfor %}
+						</datalist>
+					</div>
 					<button id="sym-add">+</button>
 				</div>
 				<div class="sub-item" id="notes">
@@ -209,8 +217,6 @@
 					<button id="med-add">+</button>
 				</div>
 				<button id="closePopup">Close</button><button id="save">Save</button>
-			</div>
-		</div>
 			</div>
 		</div>
 	</main>

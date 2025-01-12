@@ -31,6 +31,7 @@ breakfast.addEventListener("click", function (e) {
 	const removeButton = document.createElement("button");
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
+	removeButton.addEventListener("click", removeItem);
 	
 	const newDiv = document.createElement("div");
 	newDiv.classList.add("meal");
@@ -53,6 +54,7 @@ lunch.addEventListener("click", function (e) {
 	const removeButton = document.createElement("button");
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
+	removeButton.addEventListener("click", removeItem);
 
 	const newDiv = document.createElement("div");
 	newDiv.classList.add("meal");
@@ -74,6 +76,7 @@ dinner.addEventListener("click", function (e) {
 	const removeButton = document.createElement("button");
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
+	removeButton.addEventListener("click", removeItem);
 
 	const newDiv = document.createElement("div");
 	newDiv.classList.add("meal");
@@ -95,6 +98,7 @@ snack.addEventListener("click", function (e) {
 	const removeButton = document.createElement("button");
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
+	removeButton.addEventListener("click", removeItem);
 
 	const newDiv = document.createElement("div");
 	newDiv.classList.add("meal");
@@ -117,6 +121,7 @@ symptoms.addEventListener("click", function (e) {
 	const removeButton = document.createElement("button");
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
+	removeButton.addEventListener("click", removeItem);
 
 	const newDiv = document.createElement("div");
 	newDiv.classList.add("symmies");
@@ -143,15 +148,35 @@ saveMeds.addEventListener("click", function (e) {
 	const medList = document.getElementById("med-list");
 	const medData = [];
 	for (let med of medList.children) {
-		medData.append
+		const name = med.children[0].children[0].innerHTML;
+		const time = med.children[0].children[1].innerHTML;
+		let taken = false;
+		for (let otherMed of document.getElementById(time.toLowerCase()).children) {
+			if (otherMed.type == "text"){
+				if (otherMed.value == name) {
+					taken = otherMed.isChecked;
+				}
+			}
+		}
+		medData.push([name, take, time]);
 	}
-	fetch("/save_meds", {
+	fetch("/dashboard", {
 		method: "POST",
 		body: JSON.stringify({
 			medicine: true,
-
-		})
-	})
+			meds: medData
+		}),
+		headers: {
+			"Content-Type": "application/json"
+		}
+	}).then((res) => {
+		if (res.ok && res.status == 200) {
+			return res.json();
+		} else {
+			console.error(res);
+		}
+	}).then((json) => console.log(json))
+	.catch((error) => console.error(error));
 	medPopup.style.display = "none";
 
 });
