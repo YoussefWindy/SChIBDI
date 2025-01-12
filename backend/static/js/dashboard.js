@@ -1,8 +1,6 @@
 document.body.onload = (e) => {
 	if (window.location.href.indexOf("?") !== -1) {
-		const url = window.location.href;
-		const base_index = url.indexOf("=") + 1
-		document.getElementById("date_picker").value = url.slice(base_index, base_index + 4) + "-" + url.slice(base_index + 4, base_index + 6) + "-" + url.slice(base_index + 6);
+		document.getElementById("date_picker").value = window.location.href;
 	}
 }
 
@@ -12,8 +10,6 @@ pick_date.addEventListener("click", function (e) {
 	const date = document.getElementById("date_picker").value;
 	let new_date;
 	if (!date.startsWith("yyy")) {
-		new_date = date.replace("-", "");
-		console.log(url.indexOf("?"))
 		if (url.indexOf("?") !== -1) {
 			window.location.href = url.slice(0, url.indexOf("=") + 1) + new_date;
 		} else {
