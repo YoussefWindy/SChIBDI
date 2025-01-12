@@ -67,7 +67,7 @@ def callback():
 
 @app.get("/dashboard")
 def dashboard():
-      return render_template("dashboard.html")
+      return render_template("dashboard.html", meals=[["Cereal", "1 bowl"], ["Burrito", "3"], ["Pasta", "200grams"]])
 
 if __name__ == '__main__':
     app.run(debug=True)

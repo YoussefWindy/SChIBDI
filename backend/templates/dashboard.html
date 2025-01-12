@@ -19,15 +19,74 @@
 				<h2>Food</h2>
 				<div class="sub-item" id="breakfast">
 					<h3>Breakfast</h3>
+					<table>
+						<thead>
+							<tr>
+								<th>Food</th>
+								<th>Amount</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>{{meals[0][0]}}</td>
+								<td>{{meals[0][1]}}</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 				<div class="sub-item" id="lunch">
 					<h3>Lunch</h3>
+					<table>
+						<thead>
+							<tr>
+								<th>Food</th>
+								<th>Amount</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>{{meals[1][0]}}</td>
+								<td>{{meals[1][1]}}</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 				<div class="sub-item" id="dinner">
 					<h3>Dinner</h3>
+					<table>
+						<thead>
+							<tr>
+								<th>Food</th>
+								<th>Amount</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>{{meals[2][0]}}</td>
+								<td>{{meals[2][1]}}</td>
+							</tr>
+						</tbody>
+					</table>
 				</div>
 				<div class="sub-item" id="snacks">
 					<h3>Snacks</h3>
+					{% for meal in meals %}
+						{% if loop.index > 2 %}
+							<table>
+								<thead>
+									<tr>
+										<th>Food</th>
+										<th>Amount</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>{{meal[0]}}</td>
+										<td>{{meal[1]}}</td>
+									</tr>
+								</tbody>
+							</table>
+						{% endif %}
 				</div>
 			</div>
 			<div class="col" id="meds">
