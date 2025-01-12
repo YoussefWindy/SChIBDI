@@ -24,7 +24,7 @@
 						<input type="text" name="breakfast" value={{breakky}} placeholder="Breakfast" class="breakfast">
 					{% endfor %}
 					<input type="text" name="breakfast" placeholder="Breakfast" id="breakfast" class="breakfast">
-					<button id="break-submit">✔️</button>
+					<button id="break-add">+</button>
 				</div>
 				<div class="sub-item" id="lunch">
 					<h3>Lunch</h3>
@@ -32,7 +32,7 @@
 						<input type="text" name="lunch" value={{lunchy}} placeholder="Lunch" class="lunch">
 					{% endfor %}
 					<input type="text" name="lunch" placeholder="Lunch" class="lunch">
-					<button id="lunch-submit">✔️</button>
+					<button id="lunch-add">+</button>
 				</div>
 				<div class="sub-item" id="dinner">
 					<h3>Dinner</h3>
@@ -40,7 +40,7 @@
 						<input type="text" name="dinner" value={{dinny}} placeholder="Dinner" class="dinner">
 					{% endfor %}
 					<input type="text" name="dinner" placeholder="Dinner" class="dinner">
-					<button id="dinner-submit">✔️</button>
+					<button id="dinner-add">+</button>
 				</div>
 				<div class="sub-item" id="snacks">
 					<h3>Snacks</h3>
@@ -50,55 +50,52 @@
 						{% endif %}
 					{% endfor %}
 					<input type="text" name="snack" placeholder="Yummy snack 😋" class="snack">
-					<button id="snack-submit">✔️</button>
+					<button id="snack-add">+</button>
 				</div>
 			</div>
 			<div class="col" id="meds">
 				<h2>Medication</h2>
-				<div class="sub-item" id="configure">
-					<h3>Configure</h3>
-				</div>
-				<div class="sub-item" id="meds">
-					<h3>Today's Medicine</h3>
-					{% for med in meds %}
-						{% if med[1] %}
-							<input type="checkbox" name="meds" value={{med}} checked id="medications">
-						{% else %}
-							<input type="checkbox" name="meds" value={{med}} id="medications">
-						{% endif %}
-					{% endfor %}
-					<input type="text" name="add_med" placeholder="Add a medication" id="add_med"><button id="med">+</button>
+				<div class="med-inputs">
+					<div class="sub-item" id="configure">
+						<h3>Configure</h3>
+					</div>
+					<div class="sub-item" id="meds">
+						<h3>Today's Medicine</h3>
+						{% for med in meds %}
+							{% if med[1] %}
+								<input type="checkbox" name="meds" value={{med}} checked id="medications">
+							{% else %}
+								<input type="checkbox" name="meds" value={{med}} id="medications">
+							{% endif %}
+						{% endfor %}
+						<input type="text" name="meds" placeholder="Add a medication" id="add_med"><button id="med-add">+</button>
+					</div>
 				</div>
 			</div>
 			<div class="col no-vis" id="log">
 				<div class="sub-item" id="symptoms">
 					<h2>Symptoms</h2>
-					<p>Today I felt:</p>
-					<ul>
-						{% for sym in syms %}
-							<input type="text" list="symps" value={{sym}} id="sympts" name="syms" placeholder="Add a symptom">
-						{% endfor %}
-						<input type="text" list="symps" id="sympts" name="syms" placeholder="Add a symptom">
-					</ul>
-					<input type="text" list="symps" id="sympts" name="syms" placeholder="Add a symptom"><button id="symptom">+</button>
-					<datalist id="symps">
-						<option value="Nausea"></option>
-						<option value="Diarrhea"></option>
-						<option value="Mint"></option>
-						{% for sym in syms %}
-							<option value={{sym}}></option>
-						{% endfor %}
-					</datalist>
-					<button id="note-submit">✔️</button>
+						<p>Today I felt:</p>
+						<div id="sym-inputs">
+							{% for sym in syms %}
+								<input type="text" list="symps" value={{sym}} id="sympts" name="syms" placeholder="Add a symptom">
+							{% endfor %}
+							<input type="text" list="symps" class="sympts" name="syms" placeholder="Add a symptom">
+							<input type="text" list="symps" class="sympts" name="syms" placeholder="Add a symptom">
+							<datalist id="symps">
+								<option value="Nausea"></option>
+								<option value="Diarrhea"></option>
+								<option value="Mint"></option>
+								{% for sym in syms %}
+									<option value={{sym}}></option>
+								{% endfor %}
+							</datalist>
+						</div>
+					<button id="sym-add">+</button>
 				</div>
 				<div class="sub-item" id="notes">
 					<h2>Notes</h2>
-					<textarea width="25vw" name="notes" placeholder="Notes for future you...">
-						{% if notes %}
-							{{notes}}
-						{% endif %}
-					</textarea>
-					<button id="note-submit">✔️</button>
+					<textarea width="25vw" name="notes" placeholder="Notes for future you...">{% if notes %}{{notes}}{% endif %}</textarea>
 				</div>
 			</div>
 		</div>
