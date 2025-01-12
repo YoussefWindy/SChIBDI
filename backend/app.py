@@ -8,7 +8,7 @@ from urllib.parse import quote_plus, urlencode
 from authlib.integrations.flask_client import OAuth # type: ignore
 from dotenv import find_dotenv, load_dotenv # type: ignore
 from flask import Flask, redirect, render_template, session, url_for, request, jsonify # type: ignore
-from Flask_SQLAlchemy import SQLAlchemy # type: ignore
+from flask_sqlalchemy import SQLAlchemy # type: ignore
 from sqlalchemy import create_engine # type: ignore
 from flask_cors import CORS # type: ignore
 import cohere # type: ignore
@@ -324,9 +324,11 @@ def callback():
     return redirect("/dashboard")
 
 
-@app.post("/dashboard", methods=["GET", "POST"])
+@app.route("/dashboard", methods=["GET", "POST"])
 def dashboard():
     #redirect to login if not logged in
+    if "user" not in session:
+        return redirect(url_for("login"))
     
     if request.method == "GET":
 
@@ -338,6 +340,4 @@ def dashboard():
         pass
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)
