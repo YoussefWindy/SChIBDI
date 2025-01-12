@@ -130,6 +130,71 @@ symptoms.addEventListener("click", function (e) {
 	symptom_inputs.appendChild(newDiv);
 });
 
+const save_button = document.getElementById("save-changes");
+save_button.addEventListener("click", function(e) {
+	const breakfast = [];
+	for (let meal of document.getElementById("breakfast-inputs").children) {
+		meal.value.strip().toLowerCase() != '' ? breakfast.push(meal.value.strip().toLowerCase()) : console.log("empty");
+	}
+	const lunch = [];
+	for (let meal of document.getElementById("lunch-inputs").children) {
+		meal.value.strip().toLowerCase() != '' ? lunch.push(meal.value.strip().toLowerCase()) : console.log("empty");
+	}
+	const dinner = [];
+	for (let meal of document.getElementById("dinner-inputs").children) {
+		meal.value.strip().toLowerCase() != '' ? dinner.push(meal.value.strip().toLowerCase()) : console.log("empty");
+	}
+	const snack = [];
+	for (let meal of document.getElementById("snack-inputs").children) {
+		meal.value.strip().toLowerCase() != '' ? snack.push(meal.value.strip().toLowerCase()) : console.log("empty");
+	}
+
+	const meds = [];
+	for (let med of document.getElementById("morning").children) {
+		meds.push(med.value, med.isChecked, 0);
+	}
+	for (let med of document.getElementById("afternoon").children) {
+		meds.push(med.value, med.isChecked, 1);
+	}
+	for (let med of document.getElementById("evening").children) {
+		meds.push(med.value, med.isChecked, 2);
+	}
+	for (let med of document.getElementById("night").children) {
+		meds.push(med.value, med.isChecked, 3);
+	}
+
+	const symptoms = [];
+	for (let symptom of document.getElementById("sym-inputs").children) {
+		symptom.value.strip().toLowerCase() != '' ? symptoms.push(symptom.value.strip().toLowerCase()) : console.log("empty");
+	}
+
+	const data = {
+		date: window.location.href.slice(window.location.href.indexOf("+") + 1),
+		meals: {
+			breakfast: breakfast,
+			lunch: lunch,
+			dinner: dinner,
+			snack: snack
+		},
+		meds: meds,
+		symptoms: symptoms
+	};
+
+	fetch("/dashboard", {
+		method: "POST",
+		body: JSON.stringify(data),
+		headers: {"Content-Type" : "application/json"}
+	}).then((res) => {
+		if (res.ok && res.status == 200) {
+			return res.json();
+		} else {
+			console.error(res);
+		}
+	}).then((json) => console.log(json))
+	.catch((error) => console.error(error));
+});
+
+
 const closePopup = document.getElementById("closePopup");
 closePopup.addEventListener("click", function () {
 	medPopup.style.display = "none"; // Close pop-up

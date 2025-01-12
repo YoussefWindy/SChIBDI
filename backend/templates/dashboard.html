@@ -72,7 +72,7 @@
 						{% endfor %}
 						<div class="meal">
 							<input type="text" name="dinner" placeholder="Dinner" class="dinner">
-						<div class="meal">
+						</div>
 					</div>
 					<button id="dinner-add">+</button>
 				</div>
@@ -182,6 +182,8 @@
 					<textarea width="25vw" name="notes" placeholder="Notes for future you...">{% if notes %}{{notes}}{% endif %}</textarea>
 				</div>
 			</div>
+			<button id="save-changes">Save</button>
+			<button id="cancel">Cancel</button>
 		</div>
 		<div class="popup" id="medPopup">
 			<div class="popup-content">
@@ -215,7 +217,7 @@
 						<option value="Night"></option>
 					</datalist>
 					<button id="med-add">+</button>
-				</div>
+				</div><br>
 				<button id="closePopup">Close</button><button id="save">Save</button>
 			</div>
 		</div>
