@@ -1,9 +1,11 @@
 """Python Flask WebApp Auth0 integration example
 """
 
+
 import json
 from os import environ as env
 from urllib.parse import quote_plus, urlencode
+import datetime
 
 from authlib.integrations.flask_client import OAuth # type: ignore
 from dotenv import find_dotenv, load_dotenv # type: ignore
@@ -20,9 +22,22 @@ if ENV_FILE:
     load_dotenv(ENV_FILE)
 
 app = Flask(__name__)
-CORS(app)
+app.secret_key = env.get("APP_SECRET_KEY")
+CORS(app, supports_credentials=True)
 
 co = cohere.Client(env.get("COHERE_API_KEY"))
+
+oauth = OAuth(app)
+
+auth0 = oauth.register(
+    "auth0",
+    client_id=env.get("AUTH0_CLIENT_ID"),
+    client_secret=env.get("AUTH0_CLIENT_SECRET"),
+    client_kwargs={
+        "scope": "openid profile email",
+    },
+    server_metadata_url=f'https://{env.get("AUTH0_DOMAIN")}/.well-known/openid-configuration',
+)
 
 DB_PARAMS = {
     'user': 'bradley',
@@ -43,6 +58,7 @@ settings_pool = pool.SimpleConnectionPool(
     database='user_settings',
     **DB_PARAMS
 )
+
 class UserData:
     DAILY_SCHEMA = {
         'date': 'DATE NOT NULL PRIMARY KEY',
@@ -53,11 +69,13 @@ class UserData:
     }
     
     SETTINGS_SCHEMA = {
-        'id': 'SERIAL PRIMARY KEY',
-        'name': 'VARCHAR(50)',
+        'id': 'VARCHAR(120) UNIQUE',
+        'name': 'VARCHAR(100)',
         'age' : 'INTEGER',
-        'type': 'VARCHAR(75)',
-
+        'type': 'VARCHAR(100)',
+    }
+    
+    MEDS_SCHEMA = {
         # Medication settings, table has id of the user.
         'medication_name': 'VARCHAR(50)',
         'medication_time': 'BOOLEAN[]',
@@ -69,7 +87,80 @@ class UserData:
         self.food = food
         self.medication_taken = medication_taken
         self.symptoms = symptoms
- 
+
+def get_daily_data(user_id, query_date):
+    conn = daily_pool.getconn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f"""
+                SELECT date, mealtime, food, medication_taken, symptoms,  
+                FROM {user_id}  
+                WHERE date = %s
+            """, (query_date,))  # Added missing comma for single-item tuple
+            row = cur.fetchone()
+            
+            if row is None:
+                # Return default empty values if no row found
+                return (query_date, "", [], [], [])
+            return row
+    finally:
+        daily_pool.putconn(conn)
+
+def get_user_settings(user_id):
+    conn = settings_pool.getconn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f"""
+                SELECT *
+                FROM profiles
+                WHERE id = %s
+            """, (user_id,)) # Added missing comma for single-item tuple
+            row = cur.fetchone()
+            
+            if row is None:
+                return (None, None, None)
+            return row
+    finally:
+        settings_pool.putconn(conn)
+
+def get_meds_info(user_id, num_meds=False):
+    conn = settings_pool.getconn()
+    try:
+        with conn.cursor() as cur:
+            if (num_meds):
+                cur.execute(f"""
+                    SELECT COUNT(*)
+                    FROM {user_id}
+                """)
+                ret = cur.fetchone()
+                return ret[0]
+            cur.execute(f"""
+                SELECT *
+                FROM {user_id}
+            """)
+            ret = cur.fetchall()
+            
+            if ret is None:
+                return [None, None]
+            return ret
+    finally:
+        settings_pool.putconn(conn)
+
+def get_chat_history(user_id):
+    conn = settings_pool.getconn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f"""
+                SELECT *
+                FROM chat_history
+                WHERE id = %s
+            """, (user_id,))
+            ret = cur.fetchall()
+            
+            return ret
+    finally:
+        settings_pool.putconn(conn)
+
 def create_daily_table(username):
     conn = daily_pool.getconn()
     try:
@@ -95,76 +186,99 @@ def create_user_table(user_id):
     finally:
         settings_pool.putconn(conn)
 
-def update
-
-def submit(user_id, query_date):
-    """Handle GET/POST requests for user data by date"""
-    # Set correct table name
-    UserData.__table__.name = user_id
-    
-    if request.method == 'GET':
-        row = UserData.query.filter_by(date=query_date).first()
-        if not row:
-            new_entry = UserData(
-                date=query_date,
-            )
+def update_daily_data(user_id, query_date, mealtime, food, symptoms):
+    conn = daily_pool.getconn()
+    try:
+        with conn.cursor() as cur:
+            # Delete existing data for the given date
+            cur.execute(f"""
+                DELETE FROM {user_id}
+                WHERE date = %s
+            """, query_date)
             
-        return jsonify({
-            'date': row.date,
-            'mealtime': row.mealtime,
-            'food': row.food,
-            'medication_name': row.medication_name,
-            'medication_taken': row.medication_taken,
-            'symptoms': row.symptoms
-        })
+            # Insert new data
+            cur.execute(f"""
+                INSERT INTO {user_id} (date, mealtime, food, symptoms)
+                VALUES (%s, %s, %s, %s)
+            """, query_date, mealtime, food, symptoms)
+            conn.commit()
+    finally:
+        daily_pool.putconn(conn)
 
-    if request.method == 'POST':
-        data = request.get_json()
-        
-        # Validate required fields
-        if not all(k in data for k in ('mealtime', 'food')):
-            return jsonify({'error': 'Missing required fields'}), 400
+def update_meds_info(user_id, med_name, med_times):
+    conn = settings_pool.getconn()
+    try:
+        with conn.cursor() as cur:
+            # Delete existing data
+            cur.execute(f"""
+                DELETE * FROM {user_id}
+            """, med_name)
+            
+            # Insert new data
+            cur.execute(f"""
+                INSERT INTO {user_id} (med_name, med_times)
+                VALUES (%s, %s)
+            """, med_name, med_times)
+            conn.commit()
+    finally:
+        settings_pool.putconn(conn)
 
-        existing = UserData.query.filter_by(date=query_date).first()
-        if existing:
-            # Update existing record
-            existing.mealtime = data['mealtime']
-            existing.food = data['food']
-            existing.medication_name = data.get('medication_name')
-            existing.medication_taken = data.get('medication_taken')
-            existing.symptoms = data.get('symptoms')
-        else:
-            # Create new record
-            new_entry = UserData(
-                date=query_date,
-                mealtime=data['mealtime'],
-                food=data['food'],
-                medication_name=data.get('medication_name'),
-                medication_taken=data.get('medication_taken'),
-                symptoms=data.get('symptoms')
-            )
-            db.session.add(new_entry)
+def update_user_settings(user_id, name, age, type):
+    conn = settings_pool.getconn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f"""
+                INSERT INTO profiles (id, name, age, type)
+                VALUES (%s, %s, %s, %s)
+                ON CONFLICT (id) DO NOTHING
+            """, (user_id, name, age, type))
+            conn.commit()
+    finally:
+        settings_pool.putconn(conn)
 
-        try:
-            db.session.commit()
-            return jsonify({'message': 'Data saved successfully'}), 200
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'error': str(e)}), 500
-        
-app.secret_key = env.get("APP_SECRET_KEY")
+def post_daily_data(user_id, date, mealtime, food, medication_taken, symptoms):
+    conn = daily_pool.getconn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f"""
+                INSERT INTO {user_id} (date, mealtime, food, medication_taken, symptoms)
+                VALUES (%s, %s, %s, %s, %s)
+                ON CONFLICT (date) DO UPDATE
+                SET mealtime = %s, food = %s, medication_taken = %s, symptoms = %s
+            """, (date, mealtime, food, medication_taken, symptoms, mealtime, food, medication_taken, symptoms))
+            conn.commit()
+    finally:
+        daily_pool.putconn(conn)
 
-oauth = OAuth(app)
+def post_medication_data(user_id, date, mealtime, medication_taken):
+    conn = daily_pool.getconn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f"""
+                UPDATE {user_id}
+                SET medication_taken = %s
+                WHERE date = %s AND mealtime = %s
+            """, (medication_taken, date, mealtime))
+            conn.commit()
+    finally:
+        daily_pool.putconn(conn)
 
-oauth.register(
-    "auth0",
-    client_id=env.get("AUTH0_CLIENT_ID"),
-    client_secret=env.get("AUTH0_CLIENT_SECRET"),
-    client_kwargs={
-        "scope": "openid profile email",
-    },
-    server_metadata_url=f'https://{env.get("AUTH0_DOMAIN")}/.well-known/openid-configuration',
-)
+def post_medication_data(user_id, medication_name, medication_time):
+    conn = settings_pool.getconn()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f"""
+                INSERT INTO {user_id} (medication_name, medication_time)
+                VALUES (%s, %s)
+                ON CONFLICT (medication_name) DO UPDATE
+                SET medication_time = %s
+            """, (medication_name, medication_time, medication_time))
+            conn.commit()
+    finally:
+        settings_pool.putconn(conn)
+
+
+
 
 @app.route('/')
 def home():
@@ -173,13 +287,11 @@ def home():
 
 @app.route('/home')
 def main_home():
-    return render_template('index.html')
+    return render_template('index.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
 
 @app.route("/login")
 def login():
-    return oauth.auth0.authorize_redirect(
-        redirect_uri=url_for("callback", _external=True)
-    )
+    return auth0.authorize_redirect(redirect_uri=url_for("callback", _external=True))
 
 @app.route('/chat', methods=['POST', 'GET'])
 def chat():
@@ -216,23 +328,97 @@ def logout():
 
 @app.route("/callback", methods=["GET", "POST"])
 def callback():
-    token = oauth.auth0.authorize_access_token()
-    session["user"] = token
-    return redirect("/dashboard")
+    try:
+        token = oauth.auth0.authorize_access_token()
+        app.logger.info(token)
+        app.logger.info("HELLOHELLO THIS HAS BEEN REACHED")
+        session['user_info'] = token
+        user_id = session['userinfo']['sub']
+        app.logger.info("WOWOWOWOWOWW")
+        app.logger.info(session['userinfo'])
+        if not token:
+            return redirect("/login")
+        return redirect(f"/users/{user_id}/dashboard")
+    except Exception as e:
+        return redirect("/login")
 
-
-@app.get("/dashboard", methods=["GET", "POST"])
-def dashboard():
+@app.get("/users/<id>/dashboard")
+def dashboard(id):
+    app.logger.info(id)
+    if session.__sizeof__ == 0 or not session['user_info'].get("sub"):
+        return redirect("/login")
+    if request.args:
+        pass
     if request.method == "GET":
-        return render_template("dashboard.html", breakkies=["Cereal", "Burrito", "Pasta"], syms=["Nausea"])
-    if request.args: #if redirected with an argument, the 
-        user_id = session.get("user").get("sub")
-        query_date = request.args.get('date')
-        return submit(user_id, query_date)
+        user_id = session['user_info']['sub']
+        user_data = get_user_settings(user_id)
+        meds_info = get_meds_info(user_id)
+        daily_data = get_daily_data(user_id, datetime.date.today())
+        food_data = daily_data[2]
+        breakkies = []
+        lunchies = []
+        dinnies = []
+        snackies = []
+        for i in range(len(food_data)):
+            if (daily_data[1] == "breakfast"):
+                breakkies.append(food_data[i])
+            if (daily_data[1] == "lunch"):
+                lunchies.append(food_data[i])
+            if (daily_data[1] == "dinner"):
+                dinnies.append(food_data[i])
+            if (daily_data[1] == "snack"):
+                snackies.append(food_data[i])
+        
+        meds_array = [][]
+
+        #name if time
+        for i in range(len(meds_info)):
+            for j in range(4):
+                if (meds_info[1][j] == True):
+                    meds_array[0].append(meds_info[i][0])
+                    meds_array[i][2] = j
+                    if (daily_data[3] == True):
+                        meds_array[i][3] = True
+                    else:
+                        meds_array[i][3] = False
+
+        syms = daily_data[4]
+        
+        return render_template("dashboard.html", breakkies=breakkies, lunchies=lunchies, dinnies=dinnies, snackies=snackies, meds=meds_array, syms=syms)
     else:
         pass
 
+@app.route('/add_medication', methods=['POST'])
+def add_medication():
+    data = request.json
+    medication = data.get('medication')
+    
+    try:
+        # Add your database logic here
+        # For example: db.add_medication(medication)
+        return jsonify({'success': True, 'message': 'Medication added successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@app.route('/remove_medication', methods=['POST'])
+def remove_medication():
+    data = request.json
+    medication = data.get('medication')
+    
+    try:
+        # Add your database logic here
+        # For example: db.remove_medication(medication)
+        return jsonify({'success': True, 'message': 'Medication removed successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+    
+@app.route('/about-us')
+def about():
+    return render_template('about-us.html')
+
+@app.route('/contact')
+def contact():
+    return render_template('contact.html')
+
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
     app.run(debug=True)
