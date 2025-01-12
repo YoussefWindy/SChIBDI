@@ -27,8 +27,9 @@ breakfast.addEventListener("click", function (e) {
 	new_input.name = "breakfast";
 	new_input.placeholder = "Breakfast";
 
-	const newOne = breakfast_inputs.children[breakfast_inputs.length-1];
+	const newOne = breakfast_inputs.children[breakfast_inputs.children.length-1];
 	const removeButton = document.createElement("button");
+	removeButton.innerHTML = "-";
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
 	removeButton.addEventListener("click", removeItem);
@@ -50,8 +51,9 @@ lunch.addEventListener("click", function (e) {
 	new_input.name = "lunch";
 	new_input.placeholder = "Lunch";
 
-	const newOne = lunch_inputs.children[lunch_inputs.length-1];
+	const newOne = lunch_inputs.children[lunch_inputs.children.length-1];
 	const removeButton = document.createElement("button");
+	removeButton.innerHTML = "-";
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
 	removeButton.addEventListener("click", removeItem);
@@ -72,8 +74,9 @@ dinner.addEventListener("click", function (e) {
 	new_input.name = "dinner";
 	new_input.placeholder = "Dinner";
 
-	const newOne = dinner_inputs.children[breakfast_inputs.length-1];
+	const newOne = dinner_inputs.children[breakfast_inputs.children.length-1];
 	const removeButton = document.createElement("button");
+	removeButton.innerHTML = "-";
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
 	removeButton.addEventListener("click", removeItem);
@@ -94,8 +97,9 @@ snack.addEventListener("click", function (e) {
 	new_input.name = "snack";
 	new_input.placeholder = "Yummy snack 😋";
 
-	const newOne = snack_inputs.children[snack_inputs.length-1];
+	const newOne = snack_inputs.children[snack_inputs.children.length-1];
 	const removeButton = document.createElement("button");
+	removeButton.innerHTML = "-";
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
 	removeButton.addEventListener("click", removeItem);
@@ -108,17 +112,18 @@ snack.addEventListener("click", function (e) {
 });
 
 const symptoms = document.getElementById("sym-add");
-symptoms.addEventListener("click", function (e) {
+symptoms.addEventListener("click", function() {
 	const symptom_inputs = document.getElementById("sym-inputs");
 	const new_input = document.createElement("input");
 	new_input.type = "text";
 	new_input.classList.add("sympts");
 	new_input.name = "syms";
-	new_input.list = "symps";
+	new_input.setAttribute("list", "symps");
 	new_input.placeholder = "Add a symptom";
 
-	const newOne = symptom_inputs.children[symptom_inputs.length-1];
+	const newOne = symptom_inputs.children[symptom_inputs.children.length-1];
 	const removeButton = document.createElement("button");
+	removeButton.innerHTML = "-";
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
 	removeButton.addEventListener("click", removeItem);
@@ -204,8 +209,8 @@ const itemRemovers = document.getElementsByClassName("item-remove");
 for (let item of itemRemovers) {
 	item.addEventListener("click", removeItem);
 } 
-function removeItem(remove_button) {
-	this.parent.remove();
+function removeItem() {
+	this.parentElement.remove();
 }
 
 const saveMeds = document.getElementById("save");
@@ -337,21 +342,6 @@ addMedButton.addEventListener('click', function() {
 		const medItem = createMedicationItem(medication, medTime);
 		medList.appendChild(medItem);
 		medInput.value = '';
-
-
-		/*fetch('/add_medication', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ medication: medication })
-		})
-		.then(response => response.json())
-		.then(data => {
-			if (data.success) {
-				
-			}
-		}).catch(error => console.error('Error adding medication:', error));*/
 	}
 });
 
