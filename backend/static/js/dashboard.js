@@ -27,8 +27,9 @@ breakfast.addEventListener("click", function (e) {
 	new_input.name = "breakfast";
 	new_input.placeholder = "Breakfast";
 
-	const newOne = breakfast_inputs.children[0];
+	const newOne = breakfast_inputs.children[breakfast_inputs.children.length-1];
 	const removeButton = document.createElement("button");
+	removeButton.innerHTML = "-";
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
 	removeButton.addEventListener("click", removeItem);
@@ -50,8 +51,9 @@ lunch.addEventListener("click", function (e) {
 	new_input.name = "lunch";
 	new_input.placeholder = "Lunch";
 
-	const newOne = lunch_inputs.children[0];
+	const newOne = lunch_inputs.children[lunch_inputs.children.length-1];
 	const removeButton = document.createElement("button");
+	removeButton.innerHTML = "-";
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
 	removeButton.addEventListener("click", removeItem);
@@ -72,8 +74,9 @@ dinner.addEventListener("click", function (e) {
 	new_input.name = "dinner";
 	new_input.placeholder = "Dinner";
 
-	const newOne = dinner_inputs.children[0];
+	const newOne = dinner_inputs.children[breakfast_inputs.children.length-1];
 	const removeButton = document.createElement("button");
+	removeButton.innerHTML = "-";
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
 	removeButton.addEventListener("click", removeItem);
@@ -94,8 +97,9 @@ snack.addEventListener("click", function (e) {
 	new_input.name = "snack";
 	new_input.placeholder = "Yummy snack 😋";
 
-	const newOne = snack_inputs.children[0];
+	const newOne = snack_inputs.children[snack_inputs.children.length-1];
 	const removeButton = document.createElement("button");
+	removeButton.innerHTML = "-";
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
 	removeButton.addEventListener("click", removeItem);
@@ -108,17 +112,18 @@ snack.addEventListener("click", function (e) {
 });
 
 const symptoms = document.getElementById("sym-add");
-symptoms.addEventListener("click", function (e) {
+symptoms.addEventListener("click", function() {
 	const symptom_inputs = document.getElementById("sym-inputs");
 	const new_input = document.createElement("input");
 	new_input.type = "text";
 	new_input.classList.add("sympts");
 	new_input.name = "syms";
-	new_input.list = "symps";
+	new_input.setAttribute("list", "symps");
 	new_input.placeholder = "Add a symptom";
 
-	const newOne = symptom_inputs.children[0];
+	const newOne = symptom_inputs.children[symptom_inputs.children.length-1];
 	const removeButton = document.createElement("button");
+	removeButton.innerHTML = "-";
 	removeButton.classList.add("item-remove");
 	newOne.appendChild(removeButton);
 	removeButton.addEventListener("click", removeItem);
@@ -130,6 +135,71 @@ symptoms.addEventListener("click", function (e) {
 	symptom_inputs.appendChild(newDiv);
 });
 
+const save_button = document.getElementById("save-changes");
+save_button.addEventListener("click", function(e) {
+	const breakfast = [];
+	for (let meal of document.getElementById("breakfast-inputs").children) {
+		meal.value.strip().toLowerCase() != '' ? breakfast.push(meal.value.strip().toLowerCase()) : console.log("empty");
+	}
+	const lunch = [];
+	for (let meal of document.getElementById("lunch-inputs").children) {
+		meal.value.strip().toLowerCase() != '' ? lunch.push(meal.value.strip().toLowerCase()) : console.log("empty");
+	}
+	const dinner = [];
+	for (let meal of document.getElementById("dinner-inputs").children) {
+		meal.value.strip().toLowerCase() != '' ? dinner.push(meal.value.strip().toLowerCase()) : console.log("empty");
+	}
+	const snack = [];
+	for (let meal of document.getElementById("snack-inputs").children) {
+		meal.value.strip().toLowerCase() != '' ? snack.push(meal.value.strip().toLowerCase()) : console.log("empty");
+	}
+
+	const meds = [];
+	for (let med of document.getElementById("morning").children) {
+		meds.push(med.value, med.isChecked, 0);
+	}
+	for (let med of document.getElementById("afternoon").children) {
+		meds.push(med.value, med.isChecked, 1);
+	}
+	for (let med of document.getElementById("evening").children) {
+		meds.push(med.value, med.isChecked, 2);
+	}
+	for (let med of document.getElementById("night").children) {
+		meds.push(med.value, med.isChecked, 3);
+	}
+
+	const symptoms = [];
+	for (let symptom of document.getElementById("sym-inputs").children) {
+		symptom.value.strip().toLowerCase() != '' ? symptoms.push(symptom.value.strip().toLowerCase()) : console.log("empty");
+	}
+
+	const data = {
+		date: window.location.href.slice(window.location.href.indexOf("+") + 1),
+		meals: {
+			breakfast: breakfast,
+			lunch: lunch,
+			dinner: dinner,
+			snack: snack
+		},
+		meds: meds,
+		symptoms: symptoms
+	};
+
+	fetch("/dashboard", {
+		method: "POST",
+		body: JSON.stringify(data),
+		headers: {"Content-Type" : "application/json"}
+	}).then((res) => {
+		if (res.ok && res.status == 200) {
+			return res.json();
+		} else {
+			console.error(res);
+		}
+	}).then((json) => console.log(json))
+	.catch((error) => console.error(error));
+});
+
+
 const closePopup = document.getElementById("closePopup");
 closePopup.addEventListener("click", function () {
 	medPopup.style.display = "none"; // Close pop-up
@@ -139,8 +209,8 @@ const itemRemovers = document.getElementsByClassName("item-remove");
 for (let item of itemRemovers) {
 	item.addEventListener("click", removeItem);
 } 
-function removeItem(remove_button) {
-	this.parent.remove();
+function removeItem() {
+	this.parentElement.remove();
 }
 
 const saveMeds = document.getElementById("save");
@@ -272,21 +342,6 @@ addMedButton.addEventListener('click', function() {
 		const medItem = createMedicationItem(medication, medTime);
 		medList.appendChild(medItem);
 		medInput.value = '';
-
-
-		/*fetch('/add_medication', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({ medication: medication })
-		})
-		.then(response => response.json())
-		.then(data => {
-			if (data.success) {
-				
-			}
-		}).catch(error => console.error('Error adding medication:', error));*/
 	}
 });
 

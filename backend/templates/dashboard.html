@@ -9,19 +9,6 @@
 </head>
 
 <body>
-	<div class="popup" id="medPopup">
-		<div class="popup-content">
-			<h2>Welcome! Please enter the medications you're currently taking:</h2>
-			<div class="medication-form">
-				<input type="text" id="medName" name="medName" placeholder="Medication name">
-				<button id="addMedBtn">Add Medication</button>
-				<div id="medList"></div>
-				<button id="closePopup">Close</button>
-			</div>
-		</div>
-	</div>
-	
-
 	<header>
 		<h1>Dashboard</h1>
 	</header>
@@ -71,7 +58,7 @@
 						{% endfor %}
 						<div class="meal">
 							<input type="text" name="dinner" placeholder="Dinner" class="dinner">
-						<div class="meal">
+						</div>
 					</div>
 					<button id="dinner-add">+</button>
 				</div>
@@ -181,6 +168,8 @@
 					<textarea width="25vw" name="notes" placeholder="Notes for future you...">{% if notes %}{{notes}}{% endif %}</textarea>
 				</div>
 			</div>
+			<button id="save-changes">Save</button>
+			<button id="cancel">Cancel</button>
 		</div>
 		<div class="popup" id="medPopup">
 			<div class="popup-content">
@@ -214,7 +203,7 @@
 						<option value="Night"></option>
 					</datalist>
 					<button id="med-add">+</button>
-				</div>
+				</div><br>
 				<button id="closePopup">Close</button><button id="save">Save</button>
 			</div>
 		</div>
