@@ -4,7 +4,7 @@ Jinja2==3.0.3
 Werkzeug==2.0.3
 Gunicorn==20.1.0
 python-dotenv>=0.19.2
-cohere==4.0.0
+cohere>=4.0.0
 authlib>=1.0
 requests>=2.27.1
 flask_sqlalchemy==2.5.1

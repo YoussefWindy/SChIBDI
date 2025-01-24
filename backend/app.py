@@ -1,11 +1,6 @@
-"""Python Flask WebApp Auth0 integration example
-"""
-
-
-import json
+import json, datetime, atexit
 from os import environ as env
 from urllib.parse import quote_plus, urlencode
-import datetime
 
 from authlib.integrations.flask_client import OAuth # type: ignore
 from dotenv import find_dotenv, load_dotenv # type: ignore
@@ -86,17 +81,14 @@ class UserData:
         self.symptoms = symptoms
 
 def get_daily_data(user_id, query_date):
-    create_daily_table(user_id)
     conn = daily_pool.getconn()
     try:
         with conn.cursor() as cur:
-            cur.execute(f"""
-                SELECT date, mealtime, food, symptoms 
-                FROM {user_id}  
-                WHERE date = %s
-            """, (query_date,))  # Added missing comma for single-item tuple
+            cur.execute(
+                sql.SQL("CREATE TABLE IF NOT EXISTS {} ({})").format(sql.Identifier(str(user_id)), sql.SQL(', ').join(
+                        sql.SQL("{} {}").format(sql.Identifier(k), sql.SQL(v)) for k, v in UserData.DAILY_SCHEMA.items())))
+            cur.execute(sql.SQL("SELECT * FROM {} WHERE date = {}").format(sql.Identifier(str(user_id)), sql.Literal(query_date)))
             row = cur.fetchone()
-            
             if row is None:
                 # Return default empty values if no row found
                 return (query_date, "", [], [])
@@ -109,111 +101,82 @@ def get_user_settings(user_id):
     try:
         with conn.cursor() as cur:
             cur.execute("""
-                SELECT *
-                FROM profiles
-                WHERE id = %s
-            """, (str(user_id),)) # Added missing comma for single-item tuple
+                INSERT INTO profiles (id, name, age, type)
+                VALUES (%s, %s, %s, %s) ON CONFLICT (id) DO NOTHING
+            """, (str(user_id), "", 0, ""))
+            cur.execute("SELECT * FROM profiles WHERE id = %s", [str(user_id)])
             row = cur.fetchone()
-            
             if row is None:
-                return (None, None, None)
+                return (None, None, None) # if this is reached then something went wrong
             return row
     finally:
         settings_pool.putconn(conn)
 
 def get_meds_info(user_id, num_meds=False):
-    create_meds_table(user_id)
     conn = settings_pool.getconn()
     try:
         with conn.cursor() as cur:
-            table_name = f"{user_id}   ".strip()
             if num_meds:
-                cur.execute(sql.SQL("SELECT COUNT(*) FROM {}").format(sql.Identifier(table_name)))
+                cur.execute(sql.SQL("SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = %s)"), [str(user_id)])
+                table_exists = cur.fetchone()[0]
+                if not table_exists:
+                    return None
+                cur.execute(sql.SQL("SELECT COUNT(*) FROM {}").format(sql.Identifier(str(user_id))))
                 ret = cur.fetchone()
                 return ret[0]
-            cur.execute(sql.SQL("SELECT * FROM {}").format(sql.Identifier(table_name)))
+            cur.execute(
+                sql.SQL("CREATE TABLE IF NOT EXISTS {} ({})").format(sql.Identifier(str(user_id)), sql.SQL(', ').join(
+                    sql.SQL("{} {}").format(sql.Identifier(k), sql.SQL(v)) for k, v in UserData.MEDS_SCHEMA.items())))
+            cur.execute(sql.SQL("SELECT * FROM {}").format(sql.Identifier(str(user_id))))
             ret = cur.fetchall()
-            
             if ret is None:
                 return [None, None]
             return ret
     finally:
         settings_pool.putconn(conn)
 
-# def get_chat_history(user_id):
-#     conn = settings_pool.getconn()
-#     try:
-#         with conn.cursor() as cur:
-#             cur.execute(f"""
-#                 SELECT *
-#                 FROM chat_history
-#                 WHERE id = %s
-#             """, (user_id,))
-#             ret = cur.fetchall()
-            
-#             return ret
-#     finally:
-#         settings_pool.putconn(conn)
-
-def create_daily_table(username):
-    conn = daily_pool.getconn()
-    try:
-        with conn.cursor() as cur:
-            table_name = f"{username}   ".strip()
-            cur.execute(f"""
-                CREATE TABLE IF NOT EXISTS {table_name} (
-                    {', '.join([f'{k} {v}' for k, v in UserData.DAILY_SCHEMA.items()])}
-                )
-            """)
-    finally:
-        daily_pool.putconn(conn)
-
-def create_meds_table(user_id):
-    """Dynamically create table for new user"""
+def get_chat_history(user_id):
     conn = settings_pool.getconn()
     try:
         with conn.cursor() as cur:
-            cur.execute(
-                sql.SQL("CREATE TABLE IF NOT EXISTS {} ({})").format(
-                    sql.Identifier(str(user_id)),
-                    sql.SQL(', ').join(
-                        sql.SQL("{} {}").format(sql.Identifier(k), sql.SQL(v)) for k, v in UserData.MEDS_SCHEMA.items()
-                    )
-                )
-            )
+            cur.execute("SELECT * FROM chat_history WHERE id = %s", [str(user_id)])
+            return cur.fetchall()
     finally:
         settings_pool.putconn(conn)
 
+# Make this function more efficient, let's not delete everything every time?
 def update_daily_data(user_id, query_date, mealtime, food, meds_taken, symptoms):
     conn = daily_pool.getconn()
     try:
         with conn.cursor() as cur:
             # Delete existing data for the given date
-            cur.execute(sql.SQL("DELETE * FROM {} WHERE date = {}").format(sql.Identifier(user_id), sql.Literal(query_date)))
-            
+            cur.execute(sql.SQL("DELETE FROM {} WHERE date = %s").format(sql.Identifier(str(user_id))), [query_date])            
             # Insert new data
-            cur.execute("""
-                INSERT INTO %s (date, mealtime, food, meds_taken, symptoms)
-                VALUES (%s, %s, %s, %s)
-            """, (user_id, query_date, mealtime, food, meds_taken, symptoms,))
+            cur.execute(sql.SQL("""
+                INSERT INTO {} (date, mealtime, food, meds_taken, symptoms) VALUES (%s, %s, %s, %s, %s)"""
+            ).format(sql.Identifier(str(user_id))), (query_date, mealtime, food, meds_taken, symptoms))
             conn.commit()
     finally:
         daily_pool.putconn(conn)
 
+# Make this function more efficient, let's not delete everything every time?
 def update_meds_info(user_id, med_name, med_times):
     conn = settings_pool.getconn()
     try:
         with conn.cursor() as cur:
+            cur.execute(
+                sql.SQL("CREATE TABLE IF NOT EXISTS {} ({})").format(
+                    sql.Identifier(str(str(user_id))),
+                    sql.SQL(', ').join(
+                        sql.SQL("{} {}").format(sql.Identifier(k), sql.SQL(v)) for k, v in UserData.MEDS_SCHEMA.items()
+                    )
+                )
+            )
             # Delete existing data
-            cur.execute("""
-                DELETE * FROM %s
-            """, (user_id, med_name,))
-            
+            cur.execute("DELETE FROM {} WHERE med_name = %s".format(sql.Identifier(str(user_id))), (med_name,))
             # Insert new data
-            cur.execute("""
-                INSERT INTO %s (med_name, med_times)
-                VALUES (%s, %s)
-            """, (user_id, med_name, med_times,))
+            cur.execute(sql.SQL("INSERT INTO {} (med_name, med_times) VALUES (%s, %s)").format(
+                sql.Identifier(str(user_id))), (med_name, med_times))
             conn.commit()
     finally:
         settings_pool.putconn(conn)
@@ -224,9 +187,9 @@ def update_user_settings(user_id, name, age, type):
         with conn.cursor() as cur:
             cur.execute("""
                 INSERT INTO profiles (id, name, age, type)
-                VALUES (%s, %s, %s, %s)
-                ON CONFLICT (id) DO NOTHING
-            """, (user_id, name, age, type,))
+                VALUES (%s, %s, %s, %s) ON CONFLICT (id) DO UPDATE
+                SET name = EXCLUDED.name, age = EXCLUDED.age, type = EXCLUDED.type
+            """, (str(user_id), name, age, type))
             conn.commit()
     finally:
         settings_pool.putconn(conn)
@@ -280,20 +243,38 @@ def callback():
         return redirect("/dashboard")
     except Exception:
         return redirect("/login")
+
+@app.route("/profile")
+def profile():
+    if session.__sizeof__ == 0 or session['user_info'] is None:
+        return redirect("/login")
+    user_id = parse(session['user_info']['userinfo']['sub'])
+    if request.method == "GET":
+        user_data = get_user_settings(user_id)
+        return render_template("profile.html", user_data=user_data)
+    elif request.method == "POST":
+        data = request.json
+        name = data["name"]
+        age = data["age"]
+        type = data["type"]
+        update_user_settings(user_id, name, age, type)
     
 def parse(user_info):
     return int(user_info.split('|')[1], 16)
+
+known_users = open("known_users.txt").read().split("\n")
 
 @app.get("/dashboard")
 def dashboard():
     if session.__sizeof__ == 0 or session['user_info'] is None:
         return redirect("/login")
-    update_user_settings(parse(session['user_info']['userinfo']['sub']), "", 0, "")
-    if request.args:
-        pass
+    user_id = parse(session['user_info']['userinfo']['sub'])
+    if user_id not in known_users:
+        known_users.append(user_id)
+        update_user_settings(user_id, session['user_info']['userinfo']['nickname'], 0, "")
+    # if request.args: # why is this here?
+    #     pass
     if request.method == "GET":
-        user_id = parse(session['user_info']['userinfo']['sub'])
-        user_data = get_user_settings(user_id)
         meds_info = get_meds_info(user_id)
         daily_data = get_daily_data(user_id, datetime.date.today())
         food_data = daily_data[2]
@@ -302,16 +283,17 @@ def dashboard():
         dinnies = []
         snackies = []
         for i in range(len(food_data)):
-            if (daily_data[1] == "breakfast"):
-                breakkies.append(food_data[i])
-            if (daily_data[1] == "lunch"):
-                lunchies.append(food_data[i])
-            if (daily_data[1] == "dinner"):
-                dinnies.append(food_data[i])
-            if (daily_data[1] == "snack"):
-                snackies.append(food_data[i])
+            match daily_data[1]:
+                case "breakfast":
+                    breakkies.append(food_data[i])
+                case "lunch":
+                    lunchies.append(food_data[i])
+                case "dinner":
+                    dinnies.append(food_data[i])
+                case "snack":
+                    snackies.append(food_data[i])
         
-        meds_array = [[] for _ in range(get_meds_info(user_id, True))]
+        meds_array = [[] for _ in range(len(meds_info))]
 
         #name if time
         for i in range(len(meds_info)):
@@ -372,29 +354,31 @@ def dashboard():
 
         # Insert DB integration here
 
-@app.route('/add_medication', methods=['POST'])
-def add_medication():
-    data = request.json
-    medication = data.get('medication')
-    
-    try:
-        # Add your database logic here
-        # For example: db.add_medication(medication)
-        return jsonify({'success': True, 'message': 'Medication added successfully'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+# I don't know why these two below ones were made, remove them when sure they are not needed
 
-@app.route('/remove_medication', methods=['POST'])
-def remove_medication():
-    data = request.json
-    medication = data.get('medication')
+# @app.route('/add_medication', methods=['POST'])
+# def add_medication():
+#     data = request.json
+#     medication = data.get('medication')
     
-    try:
-        # Add your database logic here
-        # For example: db.remove_medication(medication)
-        return jsonify({'success': True, 'message': 'Medication removed successfully'})
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 500
+#     try:
+#         # Add your database logic here
+#         # For example: db.add_medication(medication)
+#         return jsonify({'success': True, 'message': 'Medication added successfully'})
+#     except Exception as e:
+#         return jsonify({'success': False, 'message': str(e)}), 500
+
+# @app.route('/remove_medication', methods=['POST'])
+# def remove_medication():
+#     data = request.json
+#     medication = data.get('medication')
+    
+#     try:
+#         # Add your database logic here
+#         # For example: db.remove_medication(medication)
+#         return jsonify({'success': True, 'message': 'Medication removed successfully'})
+#     except Exception as e:
+#         return jsonify({'success': False, 'message': str(e)}), 500
     
 @app.route('/about-us')
 def about():
@@ -403,6 +387,14 @@ def about():
 @app.route('/contact')
 def contact():
     return render_template('contact.html')
+
+def cleanup():
+    daily_pool.closeall()
+    settings_pool.closeall()
+    f = open("known_users.txt", "w")
+    f.write("\n".join(known_users))
+
+atexit.register(cleanup)
 
 if __name__ == '__main__':
     app.run(debug=True)
