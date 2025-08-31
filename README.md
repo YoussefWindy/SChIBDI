@@ -2,6 +2,9 @@
 
 This is a simple web application built using Flask for the backend and HTML/CSS/JavaScript for the frontend.
 
+Hackathon project for DeltaHacks XI.
+Contributors: Youssef Guindi, Bradley Low, Karl Matta, Vishnu Ajit
+
 ## Project Structure
 
 ```
